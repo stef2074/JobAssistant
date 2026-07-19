@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/JobAssistant.Domain/JobAssistant.Domain.csproj" />
     <Project Path="src/JobAssistant.Web/JobAssistant.Web.csproj" />
   </Folder>
 </Solution>
