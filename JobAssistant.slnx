@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/JobAssistant.Application/JobAssistant.Application.csproj" />
     <Project Path="src/JobAssistant.Domain/JobAssistant.Domain.csproj" />
+    <Project Path="src/JobAssistant.Infrastructure/JobAssistant.Infrastructure.csproj" />
     <Project Path="src/JobAssistant.Web/JobAssistant.Web.csproj" />
   </Folder>
 </Solution>
