@@ -284,6 +284,38 @@ Do not commit:
 - Database files
 - Build artifacts
 
+## Branch Naming
+
+Branch names should follow the pattern:
+
+```text
+<type>/JA-<number>-<jira-title>
+```
+
+Where:
+
+- `<type>` is one of:
+  - `feature`
+  - `docs`
+  - `bugfix`
+  - `refactor`
+  - `chore`
+- `<jira-title>` matches the Jira issue title, converted to lowercase with words separated by hyphens.
+
+Examples:
+
+```text
+feature/JA-22-import-resume
+
+docs/JA-21-define-product-vision-and-user-workflow
+
+bugfix/JA-35-fix-job-matching-score
+
+refactor/JA-48-simplify-job-matching-service
+```
+
+Using the Jira title keeps Jira issues, Git branches, commit messages, and pull requests aligned and easy to trace.
+
 ---
 
 # Documentation
