@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JobAssistant.Application\JobAssistant.Application.csproj" />
+    <ProjectReference Include="..\JobAssistant.Infrastructure\JobAssistant.Infrastructure.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
