@@ -1,0 +1,81 @@
+@page "/candidate-profile"
+@rendermode InteractiveServer
+
+@inject ICandidateProfileService CandidateProfileService
+
+<PageTitle>Candidate Profile</PageTitle>
+
+<h1>Candidate Profile</h1>
+
+<h2>Professional Summary</h2>
+
+<div class="mb-3">
+    <label class="form-label" for="headline">Headline</label>
+    <input id="headline"
+       class="form-control"
+       type="text"
+       @bind="_model.Headline" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label" for="summary">Professional Summary</label>
+    <textarea id="summary"
+          class="form-control"
+          rows="6"
+          @bind="_model.Summary"></textarea>
+</div>
+
+<div class="mb-3">
+    <label class="form-label" for="yearsOfExperience">
+        Total Years of Experience
+    </label>
+    <input id="yearsOfExperience"
+       class="form-control"
+       type="number"
+       @bind="_model.TotalYearsOfExperience" />
+</div>
+
+<button type="button"
+        class="btn btn-primary"
+        @onclick="Save">
+    Save
+</button>
+
+@code {
+    private readonly ProfessionalSummaryModel _model = new ProfessionalSummaryModel();
+
+    private sealed class ProfessionalSummaryModel
+    {
+        public string Headline { get; set; } = string.Empty;
+
+        public string Summary { get; set; } = string.Empty;
+
+        public int TotalYearsOfExperience { get; set; }
+    }
+
+    private async Task Save()
+    {
+        DomainCandidateProfile candidateProfile = new DomainCandidateProfile
+        {
+            ProfessionalSummary = new ProfessionalSummary
+            {
+                Headline               = _model.Headline,
+                Summary                = _model.Summary,
+                TotalYearsOfExperience = _model.TotalYearsOfExperience
+            },
+
+            Skills         = new List<Skill>(),
+            WorkExperience = new List<WorkExperience>(),
+
+            JobPreferences = new JobPreferences
+            {
+                DesiredJobTitles   = new List<string>(),
+                PreferredLocations = new List<string>(),
+                WorkArrangements   = new List<WorkArrangement>(),
+                EmploymentTypes    = new List<EmploymentType>()
+            }
+        };
+
+        await CandidateProfileService.CreateAsync(candidateProfile);
+    }
+}
