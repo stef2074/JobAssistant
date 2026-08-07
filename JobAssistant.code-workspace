@@ -5,20 +5,6 @@
 		}
 	],
 	"settings": {
-		"workbench.startupEditor": "none",
-		"files.exclude": {
-			"docs/": true,
-			"infrastructure/": true,
-			".gitignore": true,
-			"LICENSE": true,
-			"README.md": true,
-			"*.slnx": true,
-			"JobAssistant.code-workspace": true,
-			"**/bin/": true,
-			"**/obj/": true,
-			"**/*.json": true,
-			"**/*.csproj": true,
-			"**/*.md": true
-		}
+		"workbench.startupEditor": "none"
 	}
 }

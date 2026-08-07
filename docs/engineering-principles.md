@@ -50,7 +50,9 @@ Avoid classes that perform unrelated responsibilities.
 
 ## Explicit Dependencies
 
-Dependencies must be injected through constructors.
+Dependencies must be provided through dependency injection.
+
+Prefer constructor injection for classes.
 
 Example:
 
@@ -64,6 +66,14 @@ public sealed class JobMatcher
         _aiClient = aiClient;
     }
 }
+```
+
+Use the Blazor `@inject` directive for Razor components.
+
+Example:
+
+```razor
+@inject ICandidateProfileService CandidateProfileService
 ```
 
 Avoid service locators, global state, and static dependencies where practical.
@@ -326,6 +336,57 @@ Major design decisions should be recorded as Architecture Decision Records in:
 
 ```text
 docs/adr/
+```
+
+## Tutorials
+
+Create a tutorial for each Jira work item that introduces one or more new concepts, architectural patterns, or significant milestones.
+
+Tutorials should be stored in:
+
+```text
+docs/tutorials/
+```
+
+### Tutorial Template
+
+Each tutorial should contain the following sections:
+
+- Objective
+- Prerequisites
+- Concepts Introduced
+- Step-by-Step Walkthrough
+- Architecture
+- Common Mistakes
+- Debugging Tips
+- Lessons Learned
+- What We Learned
+- Key Takeaways
+- Looking Ahead
+
+### Tutorial Naming
+
+The tutorial title (H1) should follow the format:
+
+```text
+# JA-25 Building Your First Blazor Page
+```
+
+The filename is derived directly from the title by:
+
+- Preserving the Jira key (for example, `JA-25`) in uppercase.
+- Converting the remaining text to lowercase.
+- Replacing spaces with hyphens.
+- Appending the `.md` extension.
+
+Example:
+
+```text
+Title:
+# JA-25 Building Your First Blazor Page
+
+Filename:
+JA-25-building-your-first-blazor-page.md
 ```
 
 ---
