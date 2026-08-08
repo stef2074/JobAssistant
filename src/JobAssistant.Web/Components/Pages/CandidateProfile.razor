@@ -78,7 +78,14 @@
             }
         };
 
-        await CandidateProfileService.CreateAsync(candidateProfile);
+        if (_candidateProfile is null)
+        {
+            await CandidateProfileService.CreateAsync(candidateProfile);
+        }
+        else
+        {
+            await CandidateProfileService.UpdateAsync(candidateProfile);
+        }
     }
 
     protected override async Task OnInitializedAsync()
