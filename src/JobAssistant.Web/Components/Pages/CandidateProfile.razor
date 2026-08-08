@@ -57,34 +57,48 @@
 
     private async Task Save()
     {
-        DomainCandidateProfile candidateProfile = new DomainCandidateProfile
-        {
-            ProfessionalSummary = new ProfessionalSummary
-            {
-                Headline               = _model.Headline,
-                Summary                = _model.Summary,
-                TotalYearsOfExperience = _model.TotalYearsOfExperience
-            },
-
-            Skills         = new List<Skill>(),
-            WorkExperience = new List<WorkExperience>(),
-
-            JobPreferences = new JobPreferences
-            {
-                DesiredJobTitles   = new List<string>(),
-                PreferredLocations = new List<string>(),
-                WorkArrangements   = new List<WorkArrangement>(),
-                EmploymentTypes    = new List<EmploymentType>()
-            }
-        };
-
         if (_candidateProfile is null)
         {
+            DomainCandidateProfile candidateProfile = new DomainCandidateProfile
+            {
+                ProfessionalSummary = new ProfessionalSummary
+                {
+                    Headline               = _model.Headline,
+                    Summary                = _model.Summary,
+                    TotalYearsOfExperience = _model.TotalYearsOfExperience
+                },
+
+                Skills         = new List<Skill>(),
+                WorkExperience = new List<WorkExperience>(),
+
+                JobPreferences = new JobPreferences
+                {
+                    DesiredJobTitles   = new List<string>(),
+                    PreferredLocations = new List<string>(),
+                    WorkArrangements   = new List<WorkArrangement>(),
+                    EmploymentTypes    = new List<EmploymentType>()
+                }
+            };
+
             await CandidateProfileService.CreateAsync(candidateProfile);
+
+            _candidateProfile = candidateProfile;
         }
         else
         {
-            await CandidateProfileService.UpdateAsync(candidateProfile);
+            DomainCandidateProfile updatedCandidateProfile = _candidateProfile with
+            {
+                ProfessionalSummary = new ProfessionalSummary
+                {
+                    Headline               = _model.Headline,
+                    Summary                = _model.Summary,
+                    TotalYearsOfExperience = _model.TotalYearsOfExperience
+                }
+            };
+
+            await CandidateProfileService.UpdateAsync(updatedCandidateProfile);
+
+            _candidateProfile = updatedCandidateProfile;
         }
     }
 
