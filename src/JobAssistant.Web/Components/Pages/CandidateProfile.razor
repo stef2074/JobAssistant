@@ -44,6 +44,8 @@
 @code {
     private readonly ProfessionalSummaryModel _model = new ProfessionalSummaryModel();
 
+    private DomainCandidateProfile? _candidateProfile;
+
     private sealed class ProfessionalSummaryModel
     {
         public string Headline { get; set; } = string.Empty;
@@ -81,15 +83,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        DomainCandidateProfile? candidateProfile = await CandidateProfileService.GetAsync();
+        _candidateProfile = await CandidateProfileService.GetAsync();
 
-        if (candidateProfile is null)
+        if (_candidateProfile is null)
         {
             return;
-        }
+        }       
 
-        _model.Headline               = candidateProfile.ProfessionalSummary.Headline;
-        _model.Summary                = candidateProfile.ProfessionalSummary.Summary;
-        _model.TotalYearsOfExperience = candidateProfile.ProfessionalSummary.TotalYearsOfExperience;
+        _model.Headline               = _candidateProfile.ProfessionalSummary.Headline;
+        _model.Summary                = _candidateProfile.ProfessionalSummary.Summary;
+        _model.TotalYearsOfExperience = _candidateProfile.ProfessionalSummary.TotalYearsOfExperience;
     }
 }
