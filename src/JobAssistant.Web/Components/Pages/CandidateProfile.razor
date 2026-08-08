@@ -78,4 +78,9 @@
 
         await CandidateProfileService.CreateAsync(candidateProfile);
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        DomainCandidateProfile? candidateProfile = await CandidateProfileService.GetAsync();
+    }
 }
