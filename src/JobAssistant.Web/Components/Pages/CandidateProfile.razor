@@ -78,4 +78,18 @@
 
         await CandidateProfileService.CreateAsync(candidateProfile);
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        DomainCandidateProfile? candidateProfile = await CandidateProfileService.GetAsync();
+
+        if (candidateProfile is null)
+        {
+            return;
+        }
+
+        _model.Headline               = candidateProfile.ProfessionalSummary.Headline;
+        _model.Summary                = candidateProfile.ProfessionalSummary.Summary;
+        _model.TotalYearsOfExperience = candidateProfile.ProfessionalSummary.TotalYearsOfExperience;
+    }
 }
