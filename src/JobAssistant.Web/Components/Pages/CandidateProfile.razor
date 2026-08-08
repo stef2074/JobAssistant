@@ -44,6 +44,8 @@
 @code {
     private readonly ProfessionalSummaryModel _model = new ProfessionalSummaryModel();
 
+    private DomainCandidateProfile? _candidateProfile;
+
     private sealed class ProfessionalSummaryModel
     {
         public string Headline { get; set; } = string.Empty;
@@ -55,41 +57,62 @@
 
     private async Task Save()
     {
-        DomainCandidateProfile candidateProfile = new DomainCandidateProfile
+        if (_candidateProfile is null)
         {
-            ProfessionalSummary = new ProfessionalSummary
+            DomainCandidateProfile candidateProfile = new DomainCandidateProfile
             {
-                Headline               = _model.Headline,
-                Summary                = _model.Summary,
-                TotalYearsOfExperience = _model.TotalYearsOfExperience
-            },
+                ProfessionalSummary = new ProfessionalSummary
+                {
+                    Headline               = _model.Headline,
+                    Summary                = _model.Summary,
+                    TotalYearsOfExperience = _model.TotalYearsOfExperience
+                },
 
-            Skills         = new List<Skill>(),
-            WorkExperience = new List<WorkExperience>(),
+                Skills         = new List<Skill>(),
+                WorkExperience = new List<WorkExperience>(),
 
-            JobPreferences = new JobPreferences
+                JobPreferences = new JobPreferences
+                {
+                    DesiredJobTitles   = new List<string>(),
+                    PreferredLocations = new List<string>(),
+                    WorkArrangements   = new List<WorkArrangement>(),
+                    EmploymentTypes    = new List<EmploymentType>()
+                }
+            };
+
+            await CandidateProfileService.CreateAsync(candidateProfile);
+
+            _candidateProfile = candidateProfile;
+        }
+        else
+        {
+            DomainCandidateProfile updatedCandidateProfile = _candidateProfile with
             {
-                DesiredJobTitles   = new List<string>(),
-                PreferredLocations = new List<string>(),
-                WorkArrangements   = new List<WorkArrangement>(),
-                EmploymentTypes    = new List<EmploymentType>()
-            }
-        };
+                ProfessionalSummary = new ProfessionalSummary
+                {
+                    Headline               = _model.Headline,
+                    Summary                = _model.Summary,
+                    TotalYearsOfExperience = _model.TotalYearsOfExperience
+                }
+            };
 
-        await CandidateProfileService.CreateAsync(candidateProfile);
+            await CandidateProfileService.UpdateAsync(updatedCandidateProfile);
+
+            _candidateProfile = updatedCandidateProfile;
+        }
     }
 
     protected override async Task OnInitializedAsync()
     {
-        DomainCandidateProfile? candidateProfile = await CandidateProfileService.GetAsync();
+        _candidateProfile = await CandidateProfileService.GetAsync();
 
-        if (candidateProfile is null)
+        if (_candidateProfile is null)
         {
             return;
-        }
+        }       
 
-        _model.Headline               = candidateProfile.ProfessionalSummary.Headline;
-        _model.Summary                = candidateProfile.ProfessionalSummary.Summary;
-        _model.TotalYearsOfExperience = candidateProfile.ProfessionalSummary.TotalYearsOfExperience;
+        _model.Headline               = _candidateProfile.ProfessionalSummary.Headline;
+        _model.Summary                = _candidateProfile.ProfessionalSummary.Summary;
+        _model.TotalYearsOfExperience = _candidateProfile.ProfessionalSummary.TotalYearsOfExperience;
     }
 }
