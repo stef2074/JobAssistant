@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 
 @inject ICandidateProfileService CandidateProfileService
+@inject ILogger<CandidateProfile> Logger
 
 <PageTitle>Candidate Profile</PageTitle>
 
@@ -104,6 +105,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Logger.LogInformation("JA-MONITORING-TEST: Candidate Profile page initialized.");
+        
         _candidateProfile = await CandidateProfileService.GetAsync();
 
         if (_candidateProfile is null)
