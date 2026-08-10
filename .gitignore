@@ -47,3 +47,7 @@ override.tf.json
 Thumbs.db
 .env
 .env.*
+
+# Deployment artifacts
+publish/
+JobAssistant.zip
