@@ -136,6 +136,82 @@ This approach provides complete traceability between planning, implementation, a
 
 ---
 
+## Manual Azure Deployment
+
+JobAssistant is deployed to Azure App Service in the Development subscription.
+
+The initial deployment process is intentionally manual so the application deployment workflow can be understood and verified before introducing CI/CD.
+
+### Publish
+
+From the repository root:
+
+```bash
+dotnet publish \
+  src/JobAssistant.Web/JobAssistant.Web.csproj \
+  --configuration Release \
+  --output ./publish
+```
+
+### Package
+
+Package the contents of the publish directory:
+
+```bash
+cd publish
+zip -r ../JobAssistant.zip .
+cd ..
+```
+
+### Verify Azure Subscription
+
+Confirm that the Azure CLI is using the Development subscription:
+
+```bash
+az account show \
+  --query "{Name:name, SubscriptionId:id}" \
+  --output table
+```
+
+### Deploy
+
+Deploy the package to Azure App Service:
+
+```bash
+az webapp deploy \
+  --resource-group rg-jobassistant-dev \
+  --name app-jobassistant-dev \
+  --src-path JobAssistant.zip \
+  --type zip
+```
+
+### Verify Application
+
+After deployment completes, open the JobAssistant App Service and verify that the application loads and functions correctly.
+
+### Verify Application Logging
+
+JobAssistant application logs are forwarded from Azure App Service to the central Log Analytics Workspace.
+
+To verify application logging:
+
+1. Open the deployed JobAssistant application.
+2. Navigate to the Candidate Profile page to generate an application log entry.
+3. Open the `law-monitoring` Log Analytics Workspace in the Management subscription.
+4. Run the following query:
+
+```kusto
+AppServiceConsoleLogs
+| where TimeGenerated > ago(15m)
+| where ResultDescription contains "Candidate Profile page initialized."
+| project TimeGenerated, ResultDescription
+| order by TimeGenerated desc
+```
+
+A matching result confirms that JobAssistant `ILogger` output is being captured by Azure App Service and forwarded to the central Log Analytics Workspace.
+
+---
+
 ## Project Status
 
 JobAssistant is currently under active development.
