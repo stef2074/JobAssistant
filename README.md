@@ -189,6 +189,27 @@ az webapp deploy \
 
 After deployment completes, open the JobAssistant App Service and verify that the application loads and functions correctly.
 
+### Verify Application Logging
+
+JobAssistant application logs are forwarded from Azure App Service to the central Log Analytics Workspace.
+
+To verify application logging:
+
+1. Open the deployed JobAssistant application.
+2. Navigate to the Candidate Profile page to generate an application log entry.
+3. Open the `law-monitoring` Log Analytics Workspace in the Management subscription.
+4. Run the following query:
+
+```kusto
+AppServiceConsoleLogs
+| where TimeGenerated > ago(15m)
+| where ResultDescription contains "Candidate Profile page initialized."
+| project TimeGenerated, ResultDescription
+| order by TimeGenerated desc
+```
+
+A matching result confirms that JobAssistant `ILogger` output is being captured by Azure App Service and forwarded to the central Log Analytics Workspace.
+
 ---
 
 ## Project Status
