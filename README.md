@@ -136,6 +136,61 @@ This approach provides complete traceability between planning, implementation, a
 
 ---
 
+## Manual Azure Deployment
+
+JobAssistant is deployed to Azure App Service in the Development subscription.
+
+The initial deployment process is intentionally manual so the application deployment workflow can be understood and verified before introducing CI/CD.
+
+### Publish
+
+From the repository root:
+
+```bash
+dotnet publish \
+  src/JobAssistant.Web/JobAssistant.Web.csproj \
+  --configuration Release \
+  --output ./publish
+```
+
+### Package
+
+Package the contents of the publish directory:
+
+```bash
+cd publish
+zip -r ../JobAssistant.zip .
+cd ..
+```
+
+### Verify Azure Subscription
+
+Confirm that the Azure CLI is using the Development subscription:
+
+```bash
+az account show \
+  --query "{Name:name, SubscriptionId:id}" \
+  --output table
+```
+
+### Deploy
+
+Deploy the package to Azure App Service:
+
+```bash
+az webapp deploy \
+  --resource-group rg-jobassistant-dev \
+  --name app-jobassistant-dev \
+  --src-path JobAssistant.zip \
+  --type zip
+```
+
+### Verify Application
+
+After deployment completes, open the JobAssistant App Service and verify that the application loads and functions correctly.
+
+---
+
 ## Project Status
 
 JobAssistant is currently under active development.
