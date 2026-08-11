@@ -290,6 +290,134 @@ A successful authentication test reports the Development subscription, confirmin
 
 ---
 
+## Automated Azure Deployment
+
+JobAssistant is automatically built, published, and deployed to the Development Azure App Service using GitHub Actions.
+
+The deployment workflow is defined in:
+
+```text
+.github/workflows/deploy-development.yml
+```
+
+The workflow builds on the previously verified manual deployment process and GitHub Actions OIDC authentication configuration.
+
+### Deployment Workflow
+
+The Development deployment workflow performs the following stages:
+
+```text
+Checkout repository
+        ↓
+Setup .NET 10
+        ↓
+Restore dependencies
+        ↓
+Build Release
+        ↓
+Publish JobAssistant.Web
+        ↓
+Authenticate to Azure using OIDC
+        ↓
+Verify Development subscription
+        ↓
+Deploy to Azure App Service
+```
+
+The workflow currently uses `workflow_dispatch` so deployments are started manually while the deployment process is being developed and verified.
+
+### Build and Publish
+
+The workflow restores and builds the solution in Release configuration:
+
+```bash
+dotnet restore
+dotnet build --configuration Release --no-restore
+```
+
+The JobAssistant Web application is then published:
+
+```bash
+dotnet publish \
+  src/JobAssistant.Web/JobAssistant.Web.csproj \
+  --configuration Release \
+  --no-build \
+  --output ./publish
+```
+
+### Azure Authentication
+
+The deployment job uses the GitHub `development` environment and authenticates to Azure using the existing OIDC configuration.
+
+No Azure client secret or App Service publish profile is required.
+
+Before deployment, the workflow verifies that the authenticated Azure subscription is Development.
+
+### App Service Deployment
+
+The published application is deployed using `azure/webapps-deploy`:
+
+```yaml
+- name: Deploy to Azure App Service
+  uses: azure/webapps-deploy@v3
+  with:
+    app-name: app-jobassistant-dev
+    package: ./publish
+```
+
+The deployment target is:
+
+- Subscription: Development
+- Resource Group: `rg-jobassistant-dev`
+- App Service: `app-jobassistant-dev`
+
+### Run the Deployment
+
+Start the Development deployment workflow manually:
+
+```bash
+gh workflow run deploy-development.yml
+```
+
+List recent workflow runs:
+
+```bash
+gh run list \
+  --workflow deploy-development.yml \
+  --limit 5
+```
+
+A specific workflow run can be monitored using:
+
+```bash
+gh run watch <run-id> --interval 3
+```
+
+### Verify Deployment
+
+After the workflow completes successfully:
+
+1. Open the Development JobAssistant App Service.
+2. Verify that the application loads successfully.
+3. Navigate to the Candidate Profile page.
+4. Verify that the application behaves as expected.
+
+### Verify Application Logging
+
+Application logging can be verified in the central `law-monitoring` Log Analytics Workspace using:
+
+```kusto
+AppServiceConsoleLogs
+| where TimeGenerated > ago(15m)
+| where ResultDescription contains "Candidate Profile page initialized."
+| project TimeGenerated, ResultDescription
+| order by TimeGenerated desc
+```
+
+A matching result confirms that the GitHub Actions-deployed application is running successfully and that JobAssistant `ILogger` output continues to flow through Azure App Service to the central Log Analytics Workspace.
+
+---
+
 ## Project Status
 
 JobAssistant is currently under active development.
