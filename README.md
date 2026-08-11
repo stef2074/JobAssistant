@@ -212,6 +212,84 @@ A matching result confirms that JobAssistant `ILogger` output is being captured 
 
 ---
 
+## GitHub Actions Azure Authentication
+
+JobAssistant uses OpenID Connect (OIDC) to authenticate GitHub Actions to Azure without storing an Azure client secret or App Service publish profile in GitHub.
+
+Azure authentication is scoped to the GitHub `development` environment and the Azure Development subscription.
+
+### GitHub Environment
+
+The `development` GitHub environment defines the following environment variables:
+
+- `AZURE_CLIENT_ID`
+- `AZURE_TENANT_ID`
+- `AZURE_SUBSCRIPTION_ID`
+
+These values identify the Azure application registration, Microsoft Entra tenant, and Development subscription used by the workflow.
+
+### OIDC Authentication
+
+The GitHub Actions workflow requires permission to request an OIDC token:
+
+```yaml
+permissions:
+  id-token: write
+  contents: read
+```
+
+The authentication job targets the GitHub `development` environment:
+
+```yaml
+jobs:
+  authenticate:
+    environment: development
+    runs-on: ubuntu-latest
+```
+
+Azure authentication uses `azure/login` with the environment variables:
+
+```yaml
+- name: Log in to Azure
+  uses: azure/login@v2
+  with:
+    client-id: ${{ vars.AZURE_CLIENT_ID }}
+    tenant-id: ${{ vars.AZURE_TENANT_ID }}
+    subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+```
+
+The Azure application registration contains a federated credential that trusts the JobAssistant GitHub repository and `development` environment.
+
+No Azure client secret is required because GitHub obtains a short-lived OIDC token and exchanges it with Microsoft Entra ID for Azure authentication.
+
+### Verify Authentication
+
+The authentication test workflow can be started manually:
+
+```bash
+gh workflow run azure-oidc-test.yml
+```
+
+List recent workflow runs:
+
+```bash
+gh run list \
+  --workflow azure-oidc-test.yml \
+  --limit 5
+```
+
+The workflow verifies the authenticated Azure subscription using:
+
+```bash
+az account show \
+  --query "{Name:name, SubscriptionId:id}" \
+  --output table
+```
+
+A successful authentication test reports the Development subscription, confirming that GitHub Actions can authenticate to Azure using OIDC.
+
+---
+
 ## Project Status
 
 JobAssistant is currently under active development.
