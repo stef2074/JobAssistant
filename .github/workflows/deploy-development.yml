@@ -39,3 +39,9 @@ jobs:
 
       - name: Verify Azure authentication
         run: az account show --query "{Name:name, SubscriptionId:id}" --output table
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: app-jobassistant-dev
+          package: ./publish
