@@ -21,3 +21,6 @@ jobs:
 
       - name: Build
         run: dotnet build --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish src/JobAssistant.Web/JobAssistant.Web.csproj --configuration Release --no-build --output ./publish
