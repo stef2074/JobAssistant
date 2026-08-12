@@ -27,6 +27,44 @@
 </div>
 
 <div class="mb-3">
+    <label class="form-label" for="skillYearsOfExperience">
+        Years of Experience
+    </label>
+    <input id="skillYearsOfExperience"
+           class="form-control"
+           type="number"
+           @bind="_skillModel.YearsOfExperience" />
+</div>
+
+<h2>Skills</h2>
+
+<div class="mb-3">
+    <label class="form-label" for="skillName">Skill</label>
+    <input id="skillName"
+           class="form-control"
+           type="text"
+           @bind="_skillModel.Name" />
+</div>
+
+<button type="button"
+        class="btn btn-secondary mb-3"
+        @onclick="AddSkill">
+    Add Skill
+</button>
+
+@if (_skills.Count > 0)
+{
+    <ul>
+        @foreach (SkillModel skill in _skills)
+        {
+            <li>
+                @skill.Name — @skill.YearsOfExperience years
+            </li>
+        }
+    </ul>
+}
+
+<div class="mb-3">
     <label class="form-label" for="yearsOfExperience">
         Total Years of Experience
     </label>
@@ -43,17 +81,23 @@
 </button>
 
 @code {
-    private readonly ProfessionalSummaryModel _model = new ProfessionalSummaryModel();
+    private readonly ProfessionalSummaryModel _model      = new ProfessionalSummaryModel();
+    private readonly SkillModel               _skillModel = new SkillModel();
+    private readonly List<SkillModel>         _skills     = new List<SkillModel>();
 
     private DomainCandidateProfile? _candidateProfile;
 
     private sealed class ProfessionalSummaryModel
     {
-        public string Headline { get; set; } = string.Empty;
+        public string Headline               { get; set; } = string.Empty;
+        public string Summary                { get; set; } = string.Empty;
+        public int    TotalYearsOfExperience { get; set; }
+    }
 
-        public string Summary { get; set; } = string.Empty;
-
-        public int TotalYearsOfExperience { get; set; }
+    private sealed class SkillModel
+    {
+        public string Name              { get; set; } = string.Empty;
+        public int    YearsOfExperience { get; set; }
     }
 
     private async Task Save()
@@ -117,5 +161,19 @@
         _model.Headline               = _candidateProfile.ProfessionalSummary.Headline;
         _model.Summary                = _candidateProfile.ProfessionalSummary.Summary;
         _model.TotalYearsOfExperience = _candidateProfile.ProfessionalSummary.TotalYearsOfExperience;
+    }
+
+    private void AddSkill()
+    {
+        SkillModel skill = new SkillModel
+        {
+            Name              = _skillModel.Name,
+            YearsOfExperience = _skillModel.YearsOfExperience
+        };
+
+        _skills.Add(skill);
+
+        _skillModel.Name              = string.Empty;
+        _skillModel.YearsOfExperience = 0;
     }
 }
