@@ -36,24 +36,98 @@
        @bind="_model.TotalYearsOfExperience" />
 </div>
 
+<h2>Skills</h2>
+
+<div class="mb-3">
+    <label class="form-label" for="skillName">Skill</label>
+    <input id="skillName"
+           class="form-control"
+           type="text"
+           @bind="_skillModel.Name" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label" for="skillYearsOfExperience">
+        Years of Experience
+    </label>
+    <input id="skillYearsOfExperience"
+           class="form-control"
+           type="number"
+           min="1"
+           @bind="_skillModel.YearsOfExperience" />
+</div>
+
+@if (!string.IsNullOrEmpty(_skillValidationMessage))
+{
+    <div class="text-danger mb-2">
+        @_skillValidationMessage
+    </div>
+}
+
 <button type="button"
-        class="btn btn-primary"
-        @onclick="Save">
-    Save
+        class="btn btn-secondary mb-3"
+        @onclick="AddSkill">
+    Add Skill
 </button>
 
+@if (_skills.Count > 0)
+{
+    <div style="max-height: 250px; overflow-y: auto;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Skill</th>
+                    <th>Years of Experience</th>
+                    <th style="width: 1%"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (SkillModel skill in _skills)
+                {
+                    <tr>
+                        <td>@skill.Name</td>
+                        <td>@skill.YearsOfExperience</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    @onclick="() => RemoveSkill(skill)">
+                                Remove
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<div class="mt-3">
+    <button type="button"
+            class="btn btn-primary"
+            @onclick="Save">
+        Save
+    </button>
+</div>
+
 @code {
-    private readonly ProfessionalSummaryModel _model = new ProfessionalSummaryModel();
+    private readonly ProfessionalSummaryModel _model      = new ProfessionalSummaryModel();
+    private readonly SkillModel               _skillModel = new SkillModel();
+    private readonly List<SkillModel>         _skills     = new List<SkillModel>();
 
     private DomainCandidateProfile? _candidateProfile;
+    private string                  _skillValidationMessage = string.Empty;
 
     private sealed class ProfessionalSummaryModel
     {
-        public string Headline { get; set; } = string.Empty;
+        public string Headline               { get; set; } = string.Empty;
+        public string Summary                { get; set; } = string.Empty;
+        public int    TotalYearsOfExperience { get; set; }
+    }
 
-        public string Summary { get; set; } = string.Empty;
-
-        public int TotalYearsOfExperience { get; set; }
+    private sealed class SkillModel
+    {
+        public string Name              { get; set; } = string.Empty;
+        public int    YearsOfExperience { get; set; }
     }
 
     private async Task Save()
@@ -62,14 +136,9 @@
         {
             DomainCandidateProfile candidateProfile = new DomainCandidateProfile
             {
-                ProfessionalSummary = new ProfessionalSummary
-                {
-                    Headline               = _model.Headline,
-                    Summary                = _model.Summary,
-                    TotalYearsOfExperience = _model.TotalYearsOfExperience
-                },
+                ProfessionalSummary = new ProfessionalSummary { Headline = _model.Headline, Summary = _model.Summary, TotalYearsOfExperience = _model.TotalYearsOfExperience },
+                Skills              = _skills.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList(),
 
-                Skills         = new List<Skill>(),
                 WorkExperience = new List<WorkExperience>(),
 
                 JobPreferences = new JobPreferences
@@ -89,12 +158,8 @@
         {
             DomainCandidateProfile updatedCandidateProfile = _candidateProfile with
             {
-                ProfessionalSummary = new ProfessionalSummary
-                {
-                    Headline               = _model.Headline,
-                    Summary                = _model.Summary,
-                    TotalYearsOfExperience = _model.TotalYearsOfExperience
-                }
+                ProfessionalSummary = new ProfessionalSummary { Headline = _model.Headline, Summary = _model.Summary, TotalYearsOfExperience = _model.TotalYearsOfExperience },
+                Skills              = _skills.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList()
             };
 
             await CandidateProfileService.UpdateAsync(updatedCandidateProfile);
@@ -117,5 +182,53 @@
         _model.Headline               = _candidateProfile.ProfessionalSummary.Headline;
         _model.Summary                = _candidateProfile.ProfessionalSummary.Summary;
         _model.TotalYearsOfExperience = _candidateProfile.ProfessionalSummary.TotalYearsOfExperience;
+
+        _skills.Clear();
+
+        foreach (Skill skill in _candidateProfile.Skills)
+        {
+            _skills.Add(new SkillModel { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience });
+        }
+    }
+
+    private void AddSkill()
+    {
+        _skillValidationMessage = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(_skillModel.Name))
+        {
+            _skillValidationMessage = "Skill is required.";
+            return;
+        }
+
+        if (_skillModel.YearsOfExperience <= 0)
+        {
+            _skillValidationMessage = "Years of experience must be at least 1.";
+            return;
+        }
+
+        if (!Regex.IsMatch(_skillModel.Name, @"^[a-zA-Z0-9 .+#/-]+$"))
+        {
+            _skillValidationMessage = "Skill contains invalid characters.";
+            return;
+        }
+
+        if (_skills.Any(skill => string.Equals(skill.Name, _skillModel.Name.Trim(), StringComparison.OrdinalIgnoreCase)))
+        {
+            _skillValidationMessage = "Skill already exists.";
+            return;
+        }
+
+        SkillModel skill = new SkillModel { Name = _skillModel.Name.Trim(), YearsOfExperience = _skillModel.YearsOfExperience };
+
+        _skills.Add(skill);
+
+        _skillModel.Name              = string.Empty;
+        _skillModel.YearsOfExperience = 0;
+    }
+
+    private void RemoveSkill(SkillModel skill)
+    {
+        _skills.Remove(skill);
     }
 }

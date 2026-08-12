@@ -1,48 +1,53 @@
-# JA-30: Automate App Service Deployment
+# JA-30 Automate App Service Deployment
 
-## Overview
+## Objective
 
-JA-30 automates the JobAssistant Development deployment process using GitHub Actions.
+Automate the JobAssistant Development deployment process using GitHub
+Actions.
 
-The work builds on two previously verified capabilities:
-
-- The manual Azure App Service deployment and application logging process.
-- GitHub Actions authentication to Azure using OpenID Connect (OIDC).
-
-The completed workflow restores, builds, and publishes JobAssistant, authenticates to Azure without a client secret or App Service publish profile, verifies the Development subscription, and deploys the application to the Development Azure App Service.
-
-The workflow is defined in:
-
-```text
-.github/workflows/deploy-development.yml
-```
-
-The deployment target is:
-
-- Subscription: Development
-- Resource Group: `rg-jobassistant-dev`
-- App Service: `app-jobassistant-dev`
-- GitHub environment: `development`
+By completing this milestone, you will learn how to extend the verified
+manual App Service deployment and GitHub Actions OIDC authentication
+baseline into a controlled deployment workflow that restores, builds,
+publishes, authenticates, verifies the Development subscription, and
+deploys JobAssistant to Azure App Service.
 
 ## Prerequisites
 
 Before implementing JA-30, the following must already be available:
 
-- JobAssistant builds successfully with .NET 10.
-- The Development Azure App Service is deployed and operational.
-- Manual deployment to `app-jobassistant-dev` has been verified.
-- The GitHub `development` environment exists.
-- `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID` are configured as GitHub environment variables.
-- The Azure application registration contains the federated credential required for the GitHub `development` environment.
-- GitHub Actions OIDC authentication to the Development subscription has been verified.
+-   JobAssistant builds successfully with .NET 10.
+-   The Development Azure App Service is deployed and operational.
+-   Manual deployment to `app-jobassistant-dev` has been verified.
+-   The GitHub `development` environment exists.
+-   `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID`
+    are configured as GitHub environment variables.
+-   The Azure application registration contains the federated credential
+    required for the GitHub `development` environment.
+-   GitHub Actions OIDC authentication to the Development subscription
+    has been verified.
 
-## Implementation
+## Concepts Introduced
 
-### 1. Create the Development deployment workflow
+This milestone introduces:
 
-Create `.github/workflows/deploy-development.yml` with a manually triggered build:
+-   Automated .NET restore and build
+-   Automated `dotnet publish`
+-   GitHub Actions deployment workflows
+-   Incremental CI/CD verification
+-   Reusing GitHub Actions OIDC authentication
+-   Azure subscription verification inside a deployment workflow
+-   `azure/webapps-deploy`
+-   Post-deployment application verification
+-   Post-deployment logging verification
 
-```yaml
+## Step-by-Step Walkthrough
+
+### Step 1 -- Create the Development Deployment Workflow
+
+Create `.github/workflows/deploy-development.yml` with a manually
+triggered build:
+
+``` yaml
 name: Deploy Development
 
 on:
@@ -68,46 +73,49 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 ```
 
-Using `workflow_dispatch` keeps deployment manual while the pipeline is being developed and verified.
+Using `workflow_dispatch` keeps deployment manual while the pipeline is
+being developed and verified.
 
-### 2. Verify the build workflow
+### Step 2 -- Verify the Build Workflow
 
 After the workflow is available on `main`, start it manually:
 
-```bash
+``` bash
 gh workflow run deploy-development.yml
 ```
 
 List recent runs:
 
-```bash
+``` bash
 gh run list --workflow deploy-development.yml --limit 5
 ```
 
 Monitor a specific run:
 
-```bash
+``` bash
 gh run watch <run-id> --interval 3
 ```
 
-A successful run verifies checkout, .NET 10 setup, restore, and the Release build before deployment capabilities are introduced.
+A successful run verifies checkout, .NET 10 setup, restore, and the
+Release build before deployment capabilities are introduced.
 
-### 3. Add publishing
+### Step 3 -- Add Publishing
 
 Add the Publish step after Build:
 
-```yaml
+``` yaml
       - name: Publish
         run: dotnet publish src/JobAssistant.Web/JobAssistant.Web.csproj --configuration Release --no-build --output ./publish
 ```
 
-The `--no-build` option reuses the successful Release build. Run the workflow again and verify publishing succeeds before continuing.
+The `--no-build` option reuses the successful Release build. Run the
+workflow again and verify publishing succeeds before continuing.
 
-### 4. Add OIDC permissions and the Development environment
+### Step 4 -- Add OIDC Permissions and the Development Environment
 
 Add:
 
-```yaml
+``` yaml
 permissions:
   id-token: write
   contents: read
@@ -115,7 +123,7 @@ permissions:
 
 Then configure the job to use the existing GitHub environment:
 
-```yaml
+``` yaml
 jobs:
   build:
     environment: development
@@ -124,17 +132,18 @@ jobs:
 
 The `development` environment provides:
 
-- `AZURE_CLIENT_ID`
-- `AZURE_TENANT_ID`
-- `AZURE_SUBSCRIPTION_ID`
+-   `AZURE_CLIENT_ID`
+-   `AZURE_TENANT_ID`
+-   `AZURE_SUBSCRIPTION_ID`
 
-These are environment variables and are referenced through the GitHub Actions `vars` context.
+These are environment variables and are referenced through the GitHub
+Actions `vars` context.
 
-### 5. Add Azure OIDC authentication
+### Step 5 -- Add Azure OIDC Authentication
 
 After Publish, add:
 
-```yaml
+``` yaml
       - name: Log in to Azure
         uses: azure/login@v2
         with:
@@ -145,11 +154,11 @@ After Publish, add:
 
 No Azure client secret or App Service publish profile is required.
 
-### 6. Verify the Azure subscription
+### Step 6 -- Verify the Azure Subscription
 
 Before deployment, add:
 
-```yaml
+``` yaml
       - name: Verify Azure authentication
         run: |
           az account show \
@@ -157,15 +166,17 @@ Before deployment, add:
             --output table
 ```
 
-Run the workflow and verify the output identifies the subscription as `Development`.
+Run the workflow and verify the output identifies the subscription as
+`Development`.
 
-This establishes that build, publish, and OIDC authentication work together before the deployment step is introduced.
+This establishes that build, publish, and OIDC authentication work
+together before the deployment step is introduced.
 
-### 7. Add App Service deployment
+### Step 7 -- Add App Service Deployment
 
 Add:
 
-```yaml
+``` yaml
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
@@ -175,7 +186,7 @@ Add:
 
 The completed pipeline is:
 
-```text
+``` text
 Checkout repository
         ↓
 Setup .NET 10
@@ -193,46 +204,49 @@ Verify Development subscription
 Deploy to app-jobassistant-dev
 ```
 
-## Run the Complete Deployment
+### Step 8 -- Run the Complete Deployment
 
 Start the workflow:
 
-```bash
+``` bash
 gh workflow run deploy-development.yml
 ```
 
 Find the run:
 
-```bash
+``` bash
 gh run list --workflow deploy-development.yml --limit 5
 ```
 
 Monitor it:
 
-```bash
+``` bash
 gh run watch <run-id> --interval 3
 ```
 
 The completed workflow should report `success`.
 
-## Verify the Live Application
+### Step 9 -- Verify the Live Application
 
 After deployment:
 
-1. Open the Development JobAssistant App Service.
-2. Verify JobAssistant loads successfully.
-3. Navigate to the Candidate Profile page.
-4. Verify the page behaves normally.
+1.  Open the Development JobAssistant App Service.
+2.  Verify JobAssistant loads successfully.
+3.  Navigate to the Candidate Profile page.
+4.  Verify the page behaves normally.
 
-The application can take several seconds to respond while the App Service starts or warms up.
+The application can take several seconds to respond while the App
+Service starts or warms up.
 
-## Verify Application Logging
+### Step 10 -- Verify Application Logging
 
-Navigating to Candidate Profile generates the application log entry used for verification.
+Navigating to Candidate Profile generates the application log entry used
+for verification.
 
-In the central `law-monitoring` Log Analytics Workspace in the Management subscription, run:
+In the central `law-monitoring` Log Analytics Workspace in the
+Management subscription, run:
 
-```kusto
+``` kusto
 AppServiceConsoleLogs
 | where TimeGenerated > ago(15m)
 | where ResultDescription contains "Candidate Profile page initialized."
@@ -240,112 +254,237 @@ AppServiceConsoleLogs
 | order by TimeGenerated desc
 ```
 
-A matching result confirms that the GitHub Actions-deployed application is producing its expected `ILogger` output and that Azure App Service continues forwarding the logs to the central Log Analytics Workspace.
+A matching result confirms that the GitHub Actions-deployed application
+is producing its expected `ILogger` output and that Azure App Service
+continues forwarding the logs to the central Log Analytics Workspace.
 
-If the specific message does not appear immediately, temporarily broaden the query:
+If the specific message does not appear immediately, temporarily broaden
+the query:
 
-```kusto
+``` kusto
 AppServiceConsoleLogs
 | where TimeGenerated > ago(1h)
 | project TimeGenerated, ResultDescription
 | order by TimeGenerated desc
 ```
 
-This can distinguish Log Analytics ingestion delay from an overly restrictive filter.
+This can distinguish Log Analytics ingestion delay from an overly
+restrictive filter.
 
-## Verification Results
+------------------------------------------------------------------------
 
-JA-30 was verified incrementally.
+## Architecture
 
-### Build
+JA-30 combines the deployment baseline established by JA-28 with the
+OIDC authentication baseline established by JA-29.
 
-The GitHub Actions workflow successfully checked out the repository, installed .NET 10, restored dependencies, and built JobAssistant in Release configuration.
-
-### Publish
-
-The workflow successfully published `src/JobAssistant.Web/JobAssistant.Web.csproj` to `./publish`.
-
-### Azure Authentication
-
-The workflow successfully authenticated using OIDC and verified that the authenticated Azure subscription was Development. No Azure client secret or App Service publish profile was used.
-
-### App Service Deployment
-
-The completed workflow successfully deployed JobAssistant to `app-jobassistant-dev`. The live application loaded and functioned correctly.
-
-### Application Logging
-
-After navigating to Candidate Profile, `AppServiceConsoleLogs` contained fresh entries including:
-
-```text
-Candidate Profile page initialized.
-```
-
-This verified the complete operational path:
-
-```text
+``` text
 GitHub Actions
-        ↓
+        │
+        ▼
 Restore and Build
-        ↓
+        │
+        ▼
 Publish
-        ↓
-OIDC Authentication
-        ↓
+        │
+        ▼
+GitHub OIDC Token
+        │
+        ▼
+Microsoft Entra Federated Credential
+        │
+        ▼
 Development Subscription
-        ↓
-Azure App Service Deployment
-        ↓
+        │
+        ▼
+Azure App Service
+        │
+        ▼
 JobAssistant
-        ↓
+        │
+        ▼
 ILogger
-        ↓
+        │
+        ▼
 AppServiceConsoleLogs
-        ↓
+        │
+        ▼
 law-monitoring
 ```
 
-## Key Lessons
+The workflow builds and deploys the application. GitHub OIDC and
+Microsoft Entra ID provide authentication without a long-lived Azure
+deployment credential. Azure App Service hosts the application, and the
+existing monitoring infrastructure continues to collect application
+logs.
 
-### Verify the pipeline incrementally
+------------------------------------------------------------------------
 
-JA-30 was implemented and verified in stages:
+## Common Mistakes
 
-1. Restore and build.
-2. Publish.
-3. OIDC authentication and subscription verification.
-4. App Service deployment.
-5. Live application verification.
-6. Application logging verification.
+### Adding Deployment Before Verifying Earlier Stages
 
-This made failures easier to isolate.
+Introducing restore, build, publish, authentication, and deployment at
+the same time makes failures harder to isolate.
 
-### Establish authentication independently
+Verify each stage before adding the next one.
 
-JA-29 established OIDC authentication independently before JA-30 depended on it. JA-30 then verified authentication inside the deployment workflow before adding App Service deployment.
+### Forgetting the Development Environment
 
-### Use the `vars` context for environment variables
+Environment-level variables are available only when the job targets the
+environment that contains them.
 
-The Azure identifiers in the GitHub `development` environment are environment variables:
+Use:
 
-```yaml
+``` yaml
+environment: development
+```
+
+### Using `secrets` Instead of `vars`
+
+The Azure identifiers are GitHub environment variables.
+
+Use:
+
+``` yaml
 ${{ vars.AZURE_CLIENT_ID }}
 ${{ vars.AZURE_TENANT_ID }}
 ${{ vars.AZURE_SUBSCRIPTION_ID }}
 ```
 
-### OIDC removes long-lived Azure deployment credentials
+### Forgetting `id-token: write`
 
-The deployment workflow does not require an Azure client secret or App Service publish profile. GitHub Actions uses a short-lived OIDC token that Microsoft Entra ID validates against the configured federated credential.
+Without:
 
-### Successful deployment is not the final verification
+``` yaml
+id-token: write
+```
 
-A successful workflow confirms the deployment operation completed, but JA-30 also verifies the live application and centralized application logging.
+GitHub Actions cannot request the OIDC token required for Azure
+authentication.
 
-## Result
+### Skipping Subscription Verification
 
-JA-30 established a verified automated Development deployment pipeline for JobAssistant.
+A successful Azure login does not prove that the workflow is using the
+intended subscription.
 
-JobAssistant can now be restored, built, published, authenticated to Azure using OIDC, and deployed to `app-jobassistant-dev` from GitHub Actions without storing long-lived Azure deployment credentials.
+Verify the Azure context before deployment.
 
-The workflow remains manually triggered with `workflow_dispatch`, providing a controlled deployment process while the project's CI/CD capabilities continue to evolve.
+### Treating Workflow Success as Complete Verification
+
+A successful deployment action should be followed by live application
+verification and logging verification.
+
+------------------------------------------------------------------------
+
+## Debugging Tips
+
+If the workflow fails during build or publish:
+
+1.  Identify the failed step with `gh run view <run-id>`.
+2.  Verify the same .NET commands work locally.
+3.  Confirm the workflow is using .NET 10.
+
+If Azure authentication fails:
+
+1.  Confirm the job targets `development`.
+2.  Confirm the environment variables exist.
+3.  Confirm the workflow uses the `vars` context.
+4.  Confirm `id-token: write` is present.
+5.  Reuse the OIDC troubleshooting established in JA-29.
+
+If deployment succeeds but the application does not immediately appear:
+
+1.  Wait several seconds for App Service startup.
+2.  Refresh the application.
+3.  Confirm the deployment workflow completed successfully.
+4.  Verify the App Service is running.
+
+If application logs do not appear:
+
+1.  Trigger Candidate Profile initialization.
+2.  Increase the KQL time range.
+3.  Confirm App Service console logs are still forwarded to
+    `law-monitoring`.
+
+------------------------------------------------------------------------
+
+## Lessons Learned
+
+During JA-30 we learned that:
+
+-   Deployment pipelines are easier to troubleshoot when built
+    incrementally.
+-   A verified manual deployment provides a useful baseline for
+    automation.
+-   Authentication should be proven independently before deployment
+    depends on it.
+-   GitHub Actions can restore, build, and publish .NET applications.
+-   Existing OIDC authentication can be reused by deployment workflows.
+-   Subscription verification is an important deployment safety check.
+-   `azure/webapps-deploy` can deploy the published application directly
+    to Azure App Service.
+-   Long-lived Azure deployment credentials are unnecessary when OIDC is
+    configured.
+-   Successful deployment should be followed by live application and
+    logging verification.
+
+------------------------------------------------------------------------
+
+## What We Learned
+
+After completing JA-30 you can:
+
+-   Create a manually triggered deployment workflow.
+-   Restore and build JobAssistant with GitHub Actions.
+-   Publish JobAssistant.Web for deployment.
+-   Authenticate a deployment workflow to Azure using OIDC.
+-   Use GitHub environment variables through the `vars` context.
+-   Verify the authenticated Azure subscription.
+-   Deploy JobAssistant to Azure App Service.
+-   Verify the deployed application.
+-   Verify centralized application logging after deployment.
+
+------------------------------------------------------------------------
+
+## Key Takeaways
+
+JA-30 transformed the previously verified manual deployment process into
+a repeatable GitHub Actions workflow.
+
+``` text
+Source
+  ↓
+GitHub Actions
+  ↓
+Restore
+  ↓
+Build
+  ↓
+Publish
+  ↓
+OIDC Authentication
+  ↓
+Development Subscription
+  ↓
+Azure App Service
+```
+
+The workflow remains manually triggered with `workflow_dispatch`,
+providing a controlled deployment process while JobAssistant's CI/CD
+capabilities continue to evolve.
+
+------------------------------------------------------------------------
+
+## Looking Ahead
+
+The automated Development deployment baseline is now established.
+
+Future milestones can build on this foundation with:
+
+-   Automated tests in the deployment pipeline
+-   Automatic deployment triggers
+-   Deployment approvals
+-   Additional deployment environments
+-   Post-deployment health checks
+-   More advanced application monitoring
