@@ -418,6 +418,33 @@ A matching result confirms that the GitHub Actions-deployed application is runni
 
 ---
 
+## Candidate Profile
+
+The Candidate Profile captures information used to evaluate job opportunities against a user's background and experience.
+
+### Professional Summary
+
+The Professional Summary captures:
+
+- Headline
+- Professional summary
+- Total years of experience
+
+### Skills
+
+Skills can be added to and removed from the Candidate Profile.
+
+Each skill contains:
+
+- Skill name
+- Years of experience
+
+Skill input is validated before being added. Skill names must be unique, cannot be empty, and may contain only supported characters. Years of experience must be at least one year.
+
+Added skills are displayed in a scrollable table and are saved as part of the existing Candidate Profile. Previously saved skills are restored when the Candidate Profile is loaded.
+
+---
+
 ## Project Status
 
 JobAssistant is currently under active development.
