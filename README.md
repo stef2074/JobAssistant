@@ -422,13 +422,16 @@ A matching result confirms that the GitHub Actions-deployed application is runni
 
 JobAssistant is currently under active development.
 
-The current focus is establishing the project foundation, including:
+The project foundation and initial Azure deployment pipeline are established.
 
-- Repository structure
-- Architecture
-- Engineering standards
-- Solution structure
-- Core domain model
+The current focus is building the Candidate Profile experience, including:
+
+- Professional Summary
+- Skills
+- Work Experience
+- Job Preferences
+
+Candidate Profile functionality is being implemented incrementally, with each capability integrated into the existing domain and application architecture.
 
 ---
 
