@@ -27,13 +27,13 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label" for="skillYearsOfExperience">
-        Years of Experience
+    <label class="form-label" for="yearsOfExperience">
+        Total Years of Experience
     </label>
-    <input id="skillYearsOfExperience"
-           class="form-control"
-           type="number"
-           @bind="_skillModel.YearsOfExperience" />
+    <input id="yearsOfExperience"
+       class="form-control"
+       type="number"
+       @bind="_model.TotalYearsOfExperience" />
 </div>
 
 <h2>Skills</h2>
@@ -44,6 +44,16 @@
            class="form-control"
            type="text"
            @bind="_skillModel.Name" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label" for="skillYearsOfExperience">
+        Years of Experience
+    </label>
+    <input id="skillYearsOfExperience"
+           class="form-control"
+           type="number"
+           @bind="_skillModel.YearsOfExperience" />
 </div>
 
 <button type="button"
@@ -59,26 +69,24 @@
         {
             <li>
                 @skill.Name — @skill.YearsOfExperience years
+
+                <button type="button"
+                        class="btn btn-sm btn-outline-danger ms-2"
+                        @onclick="() => RemoveSkill(skill)">
+                    Remove
+                </button>
             </li>
         }
     </ul>
 }
 
-<div class="mb-3">
-    <label class="form-label" for="yearsOfExperience">
-        Total Years of Experience
-    </label>
-    <input id="yearsOfExperience"
-       class="form-control"
-       type="number"
-       @bind="_model.TotalYearsOfExperience" />
+<div class="mt-3">
+    <button type="button"
+            class="btn btn-primary"
+            @onclick="Save">
+        Save
+    </button>
 </div>
-
-<button type="button"
-        class="btn btn-primary"
-        @onclick="Save">
-    Save
-</button>
 
 @code {
     private readonly ProfessionalSummaryModel _model      = new ProfessionalSummaryModel();
@@ -175,5 +183,10 @@
 
         _skillModel.Name              = string.Empty;
         _skillModel.YearsOfExperience = 0;
+    }
+
+    private void RemoveSkill(SkillModel skill)
+    {
+        _skills.Remove(skill);
     }
 }
