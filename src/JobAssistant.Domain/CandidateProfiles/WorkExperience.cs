@@ -4,7 +4,11 @@ public sealed record WorkExperience
 {
     public required string Employer { get; init; }
 
-    public required string Location { get; init; }
+    public string? City { get; init; }
+
+    public string? State { get; init; }
+
+    public required bool IsRemote { get; init; }
 
     public required string OfficialJobTitle { get; init; }
 
