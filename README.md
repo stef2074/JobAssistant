@@ -73,6 +73,7 @@ JobAssistant is designed to:
 JobAssistant/
 ├── docs/
 │   ├── adr/
+│   ├── tutorials/
 │   ├── architecture.md
 │   └── engineering-principles.md
 │
@@ -443,6 +444,29 @@ Skill input is validated before being added. Skill names must be unique, cannot 
 
 Added skills are displayed in a scrollable table and are saved as part of the existing Candidate Profile. Previously saved skills are restored when the Candidate Profile is loaded.
 
+### Work Experience
+
+Work Experience entries capture a candidate's employment history.
+
+Each Work Experience entry includes:
+
+- Employer
+- City and state, or remote status
+- Official job title
+- Start date
+- End date or current-position status
+- Responsibilities
+- Achievements
+- Skills used in the role
+
+Responsibilities and achievements can be added and removed independently.
+
+Skills used in a role are selected from the existing Candidate Profile Skills rather than entered separately.
+
+Work Experience entries are displayed in Work Experience History and can be removed.
+
+Work Experience is saved as part of the existing Candidate Profile and restored when the Candidate Profile is loaded. Current positions are stored with a null end date.
+
 ---
 
 ## Project Status
@@ -451,14 +475,15 @@ JobAssistant is currently under active development.
 
 The project foundation and initial Azure deployment pipeline are established.
 
-The current focus is building the Candidate Profile experience, including:
+The Candidate Profile currently supports:
 
 - Professional Summary
 - Skills
 - Work Experience
-- Job Preferences
 
-Candidate Profile functionality is being implemented incrementally, with each capability integrated into the existing domain and application architecture.
+The next Candidate Profile capabilities will continue to be implemented incrementally, including Job Preferences.
+
+Each capability is integrated into the existing domain and application architecture.
 
 ---
 
