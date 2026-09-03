@@ -86,6 +86,15 @@ JobAssistant/
 │   ├── JobAssistant.Domain/
 │   ├── JobAssistant.Infrastructure/
 │   └── JobAssistant.Web/
+│       └── CandidateProfiles/
+│           ├── Models/
+│           │   ├── ProfessionalSummaryModel.cs
+│           │   ├── SkillModel.cs
+│           │   └── WorkExperienceModel.cs
+│           └── Validation/
+│               ├── ProfessionalSummaryValidation.cs
+│               ├── SkillValidation.cs
+│               └── WorkExperienceValidation.cs
 │
 └── tests/
 ```
@@ -431,6 +440,10 @@ The Professional Summary captures:
 - Professional summary
 - Total years of experience
 
+Professional Summary input is validated before being applied. Headline and professional summary are required, and total years of experience must be at least one year.
+
+The Apply action validates the editable Professional Summary and updates the applied summary displayed to the user. The applied Professional Summary is saved as part of the Candidate Profile and restored when the Candidate Profile is loaded.
+
 ### Skills
 
 Skills can be added to and removed from the Candidate Profile.
@@ -466,6 +479,18 @@ Skills used in a role are selected from the existing Candidate Profile Skills ra
 Work Experience entries are displayed in Work Experience History and can be removed.
 
 Work Experience is saved as part of the existing Candidate Profile and restored when the Candidate Profile is loaded. Current positions are stored with a null end date.
+
+### Web Models and Validation
+
+Candidate Profile UI models are organized by feature within the Web project.
+
+Each Candidate Profile UI model has a dedicated validation class:
+
+- `ProfessionalSummaryModel` → `ProfessionalSummaryValidation`
+- `SkillModel` → `SkillValidation`
+- `WorkExperienceModel` → `WorkExperienceValidation`
+
+The UI models represent Blazor-specific editing state, while their validation classes contain the validation rules for that state. This keeps UI models and validation logic separate from `CandidateProfile.razor` and from the Domain models.
 
 ---
 

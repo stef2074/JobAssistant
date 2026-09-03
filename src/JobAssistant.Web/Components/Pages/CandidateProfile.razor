@@ -11,30 +11,42 @@
 <h2>Professional Summary</h2>
 
 <div class="mb-3">
-    <label class="form-label" for="headline">Headline</label>
-    <input id="headline"
-       class="form-control"
-       type="text"
-       @bind="_professionalSummaryModel.Headline" />
+    <label class="form-label" for="Headline">Headline</label>
+    <input id="Headline" class="form-control" type="text" @bind="_professionalSummaryModel.Headline" />
 </div>
 
 <div class="mb-3">
-    <label class="form-label" for="summary">Professional Summary</label>
-    <textarea id="summary"
-          class="form-control"
-          rows="6"
-          @bind="_professionalSummaryModel.Summary"></textarea>
+    <label class="form-label" for="Summary">Professional Summary</label>
+    <textarea id="Summary" class="form-control" rows="6" @bind="_professionalSummaryModel.Summary"></textarea>
 </div>
 
 <div>
-    <label class="form-label" for="yearsOfExperience">
-        Total Years of Experience
-    </label>
-    <input id="yearsOfExperience"
-       class="form-control"
-       type="number"
-       @bind="_professionalSummaryModel.TotalYearsOfExperience" />
+    <label class="form-label" for="TotalYearsOfExperience">Total Years of Experience</label>
+    <input id="TotalYearsOfExperience" class="form-control" type="number" min="1" step="1" @bind="_professionalSummaryModel.TotalYearsOfExperience" />
 </div>
+
+<button type="button"
+        class="btn btn-secondary mt-3"
+        @onclick="ApplyProfessionalSummary">
+    Apply
+</button>
+
+@if (_professionalSummaryApplied)
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">@_appliedProfessionalSummaryModel.Headline</h5>
+
+            <p class="card-text">
+                @_appliedProfessionalSummaryModel.Summary
+            </p>
+
+            <p class="card-text mb-0">
+                Total Years of Experience: @_appliedProfessionalSummaryModel.TotalYearsOfExperience
+            </p>
+        </div>
+    </div>
+}
 
 <hr class="my-4" />
 
@@ -58,13 +70,6 @@
            min="1"
            @bind="_skillModel.YearsOfExperience" />
 </div>
-
-@if (!string.IsNullOrEmpty(_skillValidationMessage))
-{
-    <div class="text-danger mb-2">
-        @_skillValidationMessage
-    </div>
-}
 
 <button type="button"
         class="btn btn-secondary"
@@ -439,7 +444,8 @@ else
     </button>
 </div>
 
-@if (_showWorkExperienceValidationModal)
+@* Professional Summary Validation Modal *@
+@if (_professionalSummaryValidationModal)
 {
     <div class="modal fade show d-block"
          tabindex="-1"
@@ -447,7 +453,89 @@ else
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Unable to Add Work Experience</h5>
+                    <h5 class="modal-title">Unable to <strong>Apply</strong> Professional Summary</h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            aria-label="Close"
+                            @onclick="CloseProfessionalSummaryValidationModal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Please correct the following:</p>
+
+                    <ul class="mb-0">
+                        @foreach (string message in _professionalSummaryValidationMessages)
+                        {
+                            <li>@message</li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-primary"
+                            @onclick="CloseProfessionalSummaryValidationModal">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* Skill Validation Modal *@
+@if (_skillValidationModal)
+{
+    <div class="modal fade show d-block"
+         tabindex="-1"
+         style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Unable to <strong>Add</strong> Skill</h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            aria-label="Close"
+                            @onclick="CloseSkillValidationModal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Please correct the following:</p>
+
+                    <ul class="mb-0">
+                        @foreach (string message in _skillValidationMessages)
+                        {
+                            <li>@message</li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-primary"
+                            @onclick="CloseSkillValidationModal">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* Work Experience Validation Modal *@
+@if (_workExperienceValidationModal)
+{
+    <div class="modal fade show d-block"
+         tabindex="-1"
+         style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Unable to <strong>Add</strong> Work Experience</h5>
 
                     <button type="button"
                             class="btn-close"
@@ -480,52 +568,26 @@ else
 }
 
 @code {
-    // Candidate Profile
-    private DomainCandidateProfile? _candidateProfile;
+    private          DomainCandidateProfile?       _candidateProfile                      = null;
 
-    // Professional Summary
-    private readonly ProfessionalSummaryModel  _professionalSummaryModel = new ProfessionalSummaryModel();
+    private readonly ProfessionalSummaryModel      _professionalSummaryModel              = new ProfessionalSummaryModel();
+    private readonly ProfessionalSummaryModel      _appliedProfessionalSummaryModel       = new ProfessionalSummaryModel();
+    private readonly ProfessionalSummaryValidation _professionalSummaryValidation         = new ProfessionalSummaryValidation();
+    private readonly List<string>                  _professionalSummaryValidationMessages = new List<string>();
+    private          bool                          _professionalSummaryValidationModal    = false;
+    private          bool                          _professionalSummaryApplied            = false;
 
-    // Skills
-    private readonly SkillModel       _skillModel             = new SkillModel();
-    private readonly List<SkillModel> _skills                 = new List<SkillModel>();
-    private string                    _skillValidationMessage = string.Empty;
+    private readonly SkillModel                    _skillModel                            = new SkillModel();
+    private readonly List<SkillModel>              _skills                                = new List<SkillModel>();
+    private readonly SkillValidation               _skillValidation                       = new SkillValidation();
+    private readonly List<string>                  _skillValidationMessages               = new List<string>();
+    private          bool                          _skillValidationModal                  = false;
 
-    // Work Experience
-    private readonly WorkExperienceModel       _workExperienceModel               = new WorkExperienceModel();
-    private readonly List<WorkExperienceModel> _workExperiences                   = new List<WorkExperienceModel>();
-    private readonly List<string>              _workExperienceValidationMessages  = new List<string>();
-    private bool                               _showWorkExperienceValidationModal = false;
-
-    private sealed class ProfessionalSummaryModel
-    {
-        public string Headline               { get; set; } = string.Empty;
-        public string Summary                { get; set; } = string.Empty;
-        public int    TotalYearsOfExperience { get; set; }
-    }
-
-    private sealed class SkillModel
-    {
-        public string Name              { get; set; } = string.Empty;
-        public int    YearsOfExperience { get; set; }
-    }
-
-    private sealed class WorkExperienceModel
-    {
-        public string       Employer          { get; set; } = string.Empty;
-        public string       City              { get; set; } = string.Empty;
-        public string       State             { get; set; } = string.Empty;
-        public bool         IsRemote          { get; set; }
-        public string       OfficialJobTitle  { get; set; } = string.Empty;
-        public DateTime?    StartDate         { get; set; }
-        public DateTime?    EndDate           { get; set; }
-        public bool         IsCurrentPosition { get; set; }
-        public string       Responsibility    { get; set; } = string.Empty;
-        public string       Achievement       { get; set; } = string.Empty;
-        public List<string> Responsibilities  { get; set; } = new List<string>();
-        public List<string> Achievements      { get; set; } = new List<string>();
-        public List<SkillModel> Skills { get; set; } = new List<SkillModel>();
-    }
+    private readonly WorkExperienceModel           _workExperienceModel                   = new WorkExperienceModel();
+    private readonly List<WorkExperienceModel>     _workExperiences                       = new List<WorkExperienceModel>();
+    private readonly WorkExperienceValidation      _workExperienceValidation              = new WorkExperienceValidation();
+    private readonly List<string>                  _workExperienceValidationMessages      = new List<string>();
+    private          bool                          _workExperienceValidationModal         = false;
 
     private async Task Save()
     {
@@ -533,7 +595,7 @@ else
         {
             DomainCandidateProfile candidateProfile = new DomainCandidateProfile
             {
-                ProfessionalSummary = new ProfessionalSummary { Headline = _professionalSummaryModel.Headline, Summary = _professionalSummaryModel.Summary, TotalYearsOfExperience = _professionalSummaryModel.TotalYearsOfExperience },
+                ProfessionalSummary = new ProfessionalSummary { Headline = _appliedProfessionalSummaryModel.Headline, Summary = _appliedProfessionalSummaryModel.Summary, TotalYearsOfExperience = _appliedProfessionalSummaryModel.TotalYearsOfExperience },
                 Skills              = _skills.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList(),
 
                 WorkExperience = _workExperiences.Select(workExperience => new WorkExperience
@@ -586,7 +648,7 @@ else
         {
             DomainCandidateProfile updatedCandidateProfile = _candidateProfile with
             {
-                ProfessionalSummary = new ProfessionalSummary { Headline = _professionalSummaryModel.Headline, Summary = _professionalSummaryModel.Summary, TotalYearsOfExperience = _professionalSummaryModel.TotalYearsOfExperience },
+                ProfessionalSummary = new ProfessionalSummary { Headline = _appliedProfessionalSummaryModel.Headline, Summary = _appliedProfessionalSummaryModel.Summary, TotalYearsOfExperience = _appliedProfessionalSummaryModel.TotalYearsOfExperience },
                 Skills              = _skills.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList(),
 
                 WorkExperience = _workExperiences.Select(workExperience => new WorkExperience
@@ -638,11 +700,17 @@ else
         if (_candidateProfile is null)
         {
             return;
-        }       
+        }
 
         _professionalSummaryModel.Headline               = _candidateProfile.ProfessionalSummary.Headline;
         _professionalSummaryModel.Summary                = _candidateProfile.ProfessionalSummary.Summary;
         _professionalSummaryModel.TotalYearsOfExperience = _candidateProfile.ProfessionalSummary.TotalYearsOfExperience;
+
+        _appliedProfessionalSummaryModel.Headline               = _professionalSummaryModel.Headline;
+        _appliedProfessionalSummaryModel.Summary                = _professionalSummaryModel.Summary;
+        _appliedProfessionalSummaryModel.TotalYearsOfExperience = _professionalSummaryModel.TotalYearsOfExperience;
+
+        _professionalSummaryApplied = true;
 
         _skills.Clear();
 
@@ -694,36 +762,55 @@ else
         }
     }
 
+    private void CloseProfessionalSummaryValidationModal()
+    {
+        _professionalSummaryValidationModal = false;
+    }
+
+    private void CloseSkillValidationModal()
+    {
+        _skillValidationModal = false;
+    }
+
+    private void CloseWorkExperienceValidationModal()
+    {
+        _workExperienceValidationModal = false;
+    }
+
+    private void ApplyProfessionalSummary()
+    {
+        #region - Professional Summary Validation
+        _professionalSummaryValidationMessages.Clear();
+        _professionalSummaryValidationMessages.AddRange(_professionalSummaryValidation.Validate(_professionalSummaryModel));
+
+        if (_professionalSummaryValidationMessages.Count > 0)
+        {
+            _professionalSummaryValidationModal = true;
+            return;
+        }
+        #endregion
+
+        _appliedProfessionalSummaryModel.Headline               = _professionalSummaryModel.Headline;
+        _appliedProfessionalSummaryModel.Summary                = _professionalSummaryModel.Summary;
+        _appliedProfessionalSummaryModel.TotalYearsOfExperience = _professionalSummaryModel.TotalYearsOfExperience;
+
+        _professionalSummaryApplied = true;
+    }
+
     private void AddSkill()
     {
-        _skillValidationMessage = string.Empty;
+        #region - Skill Validation
+        _skillValidationMessages.Clear();
+        _skillValidationMessages.AddRange(_skillValidation.Validate(_skillModel, _skills));
 
-        if (string.IsNullOrWhiteSpace(_skillModel.Name))
+        if (_skillValidationMessages.Count > 0)
         {
-            _skillValidationMessage = "Skill is required.";
+            _skillValidationModal = true;
             return;
         }
-
-        if (_skillModel.YearsOfExperience <= 0)
-        {
-            _skillValidationMessage = "Years of experience must be at least 1.";
-            return;
-        }
-
-        if (!Regex.IsMatch(_skillModel.Name, @"^[a-zA-Z0-9 .+#/-]+$"))
-        {
-            _skillValidationMessage = "Skill contains invalid characters.";
-            return;
-        }
-
-        if (_skills.Any(skill => string.Equals(skill.Name, _skillModel.Name.Trim(), StringComparison.OrdinalIgnoreCase)))
-        {
-            _skillValidationMessage = "Skill already exists.";
-            return;
-        }
+        #endregion
 
         SkillModel skill = new SkillModel { Name = _skillModel.Name.Trim(), YearsOfExperience = _skillModel.YearsOfExperience };
-
         _skills.Add(skill);
 
         _skillModel.Name              = string.Empty;
@@ -739,64 +826,16 @@ else
 
     private void AddWorkExperience()
     {
+        #region - Work Experience Validation
         _workExperienceValidationMessages.Clear();
-
-        if (string.IsNullOrWhiteSpace(_workExperienceModel.Employer))
-        {
-            _workExperienceValidationMessages.Add("Employer is required.");
-        }
-
-        if (!_workExperienceModel.IsRemote && string.IsNullOrWhiteSpace(_workExperienceModel.City))
-        {
-            _workExperienceValidationMessages.Add("City is required.");
-        }
-
-        if (!_workExperienceModel.IsRemote && string.IsNullOrWhiteSpace(_workExperienceModel.State))
-        {
-            _workExperienceValidationMessages.Add("State is required.");
-        }
-
-        if (string.IsNullOrWhiteSpace(_workExperienceModel.OfficialJobTitle))
-        {
-            _workExperienceValidationMessages.Add("Official job title is required.");
-        }
-
-        if (_workExperienceModel.StartDate is null)
-        {
-            _workExperienceValidationMessages.Add("Start date is required.");
-        }
-
-        if (!_workExperienceModel.IsCurrentPosition && _workExperienceModel.EndDate is null)
-        {
-            _workExperienceValidationMessages.Add(
-                "End date is required unless this is the current position.");
-        }
-
-        if (_workExperienceModel.EndDate is not null &&
-            _workExperienceModel.StartDate is not null &&
-            _workExperienceModel.EndDate < _workExperienceModel.StartDate)
-        {
-            _workExperienceValidationMessages.Add(
-                "End date cannot be before start date.");
-        }
-
-        if (_workExperienceModel.Responsibilities.Count == 0)
-        {
-            _workExperienceValidationMessages.Add(
-                "At least one responsibility is required.");
-        }
-
-        if (_workExperienceModel.Skills.Count == 0)
-        {
-            _workExperienceValidationMessages.Add(
-                "At least one skill used in this role is required.");
-        }
+        _workExperienceValidationMessages.AddRange(_workExperienceValidation.Validate(_workExperienceModel));
 
         if (_workExperienceValidationMessages.Count > 0)
         {
-            _showWorkExperienceValidationModal = true;
+            _workExperienceValidationModal = true;
             return;
         }
+        #endregion
 
         WorkExperienceModel workExperience = new WorkExperienceModel
         {
@@ -882,11 +921,6 @@ else
             _workExperienceModel.City  = string.Empty;
             _workExperienceModel.State = string.Empty;
         }
-    }
-
-    private void CloseWorkExperienceValidationModal()
-    {
-        _showWorkExperienceValidationModal = false;
     }
 
     private void WorkExperienceSkillChanged(SkillModel skill, ChangeEventArgs eventArgs)
