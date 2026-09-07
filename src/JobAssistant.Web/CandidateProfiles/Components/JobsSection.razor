@@ -5,7 +5,7 @@
     <input id="employer"
            class="form-control"
            type="text"
-           @bind="_workExperienceEditState.Employer" />
+           @bind="_jobEditState.Employer" />
 </div>
 
 <div class="mb-3">
@@ -13,16 +13,16 @@
     <input id="city"
            class="form-control"
            type="text"
-           disabled="@_workExperienceEditState.IsRemote"
-           @bind="_workExperienceEditState.City" />
+           disabled="@_jobEditState.IsRemote"
+           @bind="_jobEditState.City" />
 </div>
 
 <div class="mb-3">
     <label class="form-label" for="state">State</label>
     <select id="state"
             class="form-select"
-            disabled="@_workExperienceEditState.IsRemote"
-            @bind="_workExperienceEditState.State">
+            disabled="@_jobEditState.IsRemote"
+            @bind="_jobEditState.State">
         <option value="">Select State</option>
         <option value="AL">AL</option>
         <option value="AK">AK</option>
@@ -82,7 +82,7 @@
     <input id="remote"
            class="form-check-input"
            type="checkbox"
-           @bind="_workExperienceEditState.IsRemote"
+           @bind="_jobEditState.IsRemote"
            @bind:after="RemoteChanged" />
 
     <label class="form-check-label" for="remote">
@@ -95,7 +95,7 @@
     <input id="officialJobTitle"
            class="form-control"
            type="text"
-           @bind="_workExperienceEditState.OfficialJobTitle" />
+           @bind="_jobEditState.OfficialJobTitle" />
 </div>
 
 <div class="mb-3">
@@ -103,7 +103,7 @@
     <input id="startDate"
            class="form-control"
            type="month"
-           @bind="_workExperienceEditState.StartDate"
+           @bind="_jobEditState.StartDate"
            @bind:format="yyyy-MM" />
 </div>
 
@@ -112,8 +112,8 @@
     <input id="endDate"
            class="form-control"
            type="month"
-           disabled="@_workExperienceEditState.IsCurrentPosition"
-           @bind="_workExperienceEditState.EndDate"
+           disabled="@_jobEditState.IsCurrentPosition"
+           @bind="_jobEditState.EndDate"
            @bind:format="yyyy-MM" />
 </div>
 
@@ -121,7 +121,7 @@
     <input id="currentPosition"
            class="form-check-input"
            type="checkbox"
-           @bind="_workExperienceEditState.IsCurrentPosition"
+           @bind="_jobEditState.IsCurrentPosition"
            @bind:after="CurrentPositionChanged" />
 
     <label class="form-check-label" for="currentPosition">
@@ -138,7 +138,7 @@
     <textarea id="responsibility"
               class="form-control"
               rows="3"
-              @bind="_workExperienceEditState.Responsibility">
+              @bind="_jobEditState.Responsibility">
     </textarea>
 </div>
 
@@ -148,11 +148,11 @@
     Add Responsibility
 </button>
 
-@if (_workExperienceEditState.Responsibilities.Count > 0)
+@if (_jobEditState.Responsibilities.Count > 0)
 {
     <table class="table mb-0">
         <tbody>
-            @foreach (string responsibility in _workExperienceEditState.Responsibilities)
+            @foreach (string responsibility in _jobEditState.Responsibilities)
             {
                 <tr>
                     <td>@responsibility</td>
@@ -178,7 +178,7 @@
     <textarea id="achievement"
               class="form-control"
               rows="3"
-              @bind="_workExperienceEditState.Achievement">
+              @bind="_jobEditState.Achievement">
     </textarea>
 </div>
 
@@ -188,11 +188,11 @@
     Add Achievement
 </button>
 
-@if (_workExperienceEditState.Achievements.Count > 0)
+@if (_jobEditState.Achievements.Count > 0)
 {
     <table class="table mb-0">
         <tbody>
-            @foreach (string achievement in _workExperienceEditState.Achievements)
+            @foreach (string achievement in _jobEditState.Achievements)
             {
                 <tr>
                     <td>@achievement</td>
@@ -226,12 +226,12 @@ else
         <div class="form-check">
             <input class="form-check-input"
                    type="checkbox"
-                   id="@($"workExperienceSkill-{skill.Name}")"
-                   checked="@_workExperienceEditState.Skills.Contains(skill)"
-                   @onchange="eventArgs => WorkExperienceSkillSelectionChanged(skill, eventArgs)" />
+                   id="@($"jobSkill-{skill.Name}")"
+                   checked="@_jobEditState.Skills.Contains(skill)"
+                   @onchange="eventArgs => JobSkillSelectionChanged(skill, eventArgs)" />
 
             <label class="form-check-label"
-                   for="@($"workExperienceSkill-{skill.Name}")">
+                   for="@($"jobSkill-{skill.Name}")">
                 @skill.Name
             </label>
         </div>
@@ -243,44 +243,44 @@ else
 <div>
     <button type="button"
             class="btn btn-secondary"
-            @onclick="AddWorkExperience">
-        Add Work Experience
+            @onclick="AddJob">
+        Add Job
     </button>
 </div>
 
 <hr class="my-4" />
 
-@if (WorkExperienceAppliedState.Count > 0)
+@if (JobAppliedState.Count > 0)
 {
-    <h3>Work Experience History</h3>
+    <h3>Job History</h3>
 
-    @foreach (WorkExperienceModel workExperience in WorkExperienceAppliedState)
+    @foreach (JobModel job in JobAppliedState)
     {
         <div class="card mb-3">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4 class="card-title">@workExperience.OfficialJobTitle</h4>
-                        <div>@workExperience.Employer</div>
+                        <h4 class="card-title">@job.OfficialJobTitle</h4>
+                        <div>@job.Employer</div>
 
                         <div>
-                            @(workExperience.IsRemote
+                            @(job.IsRemote
                                 ? "Remote"
-                                : $"{workExperience.City}, {workExperience.State}")
+                                : $"{job.City}, {job.State}")
                         </div>
 
                         <div>
-                            @workExperience.StartDate?.ToString("MMM yyyy") -
-                            @(workExperience.IsCurrentPosition
+                            @job.StartDate?.ToString("MMM yyyy") -
+                            @(job.IsCurrentPosition
                                 ? "Present"
-                                : workExperience.EndDate?.ToString("MMM yyyy"))
+                                : job.EndDate?.ToString("MMM yyyy"))
                         </div>
                     </div>
 
                     <div>
                         <button type="button"
                                 class="btn btn-sm btn-outline-danger"
-                                @onclick="() => RemoveWorkExperience(workExperience)">
+                                @onclick="() => RemoveJob(job)">
                             Remove
                         </button>
                     </div>
@@ -289,30 +289,30 @@ else
                 <h5 class="mt-3">Responsibilities</h5>
 
                 <ul class="mb-0">
-                    @foreach (string responsibility in workExperience.Responsibilities)
+                    @foreach (string responsibility in job.Responsibilities)
                     {
                         <li>@responsibility</li>
                     }
                 </ul>
 
-                @if (workExperience.Achievements.Count > 0)
+                @if (job.Achievements.Count > 0)
                 {
                     <h5 class="mt-3">Achievements</h5>
 
                     <ul class="mb-0">
-                        @foreach (string achievement in workExperience.Achievements)
+                        @foreach (string achievement in job.Achievements)
                         {
                             <li>@achievement</li>
                         }
                     </ul>
                 }
 
-                @if (workExperience.Skills.Count > 0)
+                @if (job.Skills.Count > 0)
                 {
                     <h5 class="mt-3">Skills Used</h5>
 
                     <ul class="mb-0">
-                        @foreach (SkillModel skill in workExperience.Skills)
+                        @foreach (SkillModel skill in job.Skills)
                         {
                             <li>@skill.Name</li>
                         }
@@ -325,7 +325,7 @@ else
 
 <hr class="my-4" />
 
-@if (_workExperienceValidationModal)
+@if (_jobValidationModal)
 {
     <div class="modal fade show d-block"
          tabindex="-1"
@@ -334,13 +334,13 @@ else
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        Unable to <strong>Add</strong> Work Experience
+                        Unable to <strong>Add</strong> Job
                     </h5>
 
                     <button type="button"
                             class="btn-close"
                             aria-label="Close"
-                            @onclick="CloseWorkExperienceValidationModal">
+                            @onclick="CloseJobValidationModal">
                     </button>
                 </div>
 
@@ -348,7 +348,7 @@ else
                     <p>Please correct the following:</p>
 
                     <ul class="mb-0">
-                        @foreach (string message in _workExperienceValidationMessages)
+                        @foreach (string message in _jobValidationMessages)
                         {
                             <li>@message</li>
                         }
@@ -358,7 +358,7 @@ else
                 <div class="modal-footer">
                     <button type="button"
                             class="btn btn-primary"
-                            @onclick="CloseWorkExperienceValidationModal">
+                            @onclick="CloseJobValidationModal">
                         OK
                     </button>
                 </div>
@@ -368,119 +368,119 @@ else
 }
 
 @code {
-    [Parameter] public List<WorkExperienceModel> WorkExperienceAppliedState { get; set; } = new List<WorkExperienceModel>();
+    [Parameter] public List<JobModel> JobAppliedState { get; set; } = new List<JobModel>();
     [Parameter] public List<SkillModel>          Skills                     { get; set; } = new List<SkillModel>();
 
-    private readonly WorkExperienceModel      _workExperienceEditState          = new WorkExperienceModel();
-    private readonly WorkExperienceValidation _workExperienceValidation         = new WorkExperienceValidation();
-    private readonly List<string>             _workExperienceValidationMessages = new List<string>();
+    private readonly JobModel      _jobEditState          = new JobModel();
+    private readonly JobValidation _jobValidation         = new JobValidation();
+    private readonly List<string>             _jobValidationMessages = new List<string>();
 
-    private bool _workExperienceValidationModal = false;
+    private bool _jobValidationModal = false;
 
-    private void CloseWorkExperienceValidationModal()
-    { _workExperienceValidationModal = false; }
+    private void CloseJobValidationModal()
+    { _jobValidationModal = false; }
 
-    private void AddWorkExperience()
+    private void AddJob()
     {
         #region - Validation
-        _workExperienceValidationMessages.Clear();
-        _workExperienceValidationMessages.AddRange(_workExperienceValidation.Validate(_workExperienceEditState));
+        _jobValidationMessages.Clear();
+        _jobValidationMessages.AddRange(_jobValidation.Validate(_jobEditState));
 
-        if (_workExperienceValidationMessages.Count > 0)
+        if (_jobValidationMessages.Count > 0)
         {
-            _workExperienceValidationModal = true;
+            _jobValidationModal = true;
 
             return;
         }
         #endregion
 
-        WorkExperienceModel workExperience = new WorkExperienceModel
+        JobModel job = new JobModel
         {
-            Employer          = _workExperienceEditState.Employer.Trim(),
-            City              = _workExperienceEditState.IsRemote ? string.Empty : _workExperienceEditState.City.Trim(),
-            State             = _workExperienceEditState.IsRemote ? string.Empty : _workExperienceEditState.State,
-            IsRemote          = _workExperienceEditState.IsRemote,
-            OfficialJobTitle  = _workExperienceEditState.OfficialJobTitle.Trim(),
-            StartDate         = _workExperienceEditState.StartDate,
-            EndDate           = _workExperienceEditState.EndDate,
-            IsCurrentPosition = _workExperienceEditState.IsCurrentPosition,
-            Responsibilities  = new List<string>(_workExperienceEditState.Responsibilities),
-            Achievements      = new List<string>(_workExperienceEditState.Achievements),
-            Skills            = new List<SkillModel>(_workExperienceEditState.Skills)
+            Employer          = _jobEditState.Employer.Trim(),
+            City              = _jobEditState.IsRemote ? string.Empty : _jobEditState.City.Trim(),
+            State             = _jobEditState.IsRemote ? string.Empty : _jobEditState.State,
+            IsRemote          = _jobEditState.IsRemote,
+            OfficialJobTitle  = _jobEditState.OfficialJobTitle.Trim(),
+            StartDate         = _jobEditState.StartDate,
+            EndDate           = _jobEditState.EndDate,
+            IsCurrentPosition = _jobEditState.IsCurrentPosition,
+            Responsibilities  = new List<string>(_jobEditState.Responsibilities),
+            Achievements      = new List<string>(_jobEditState.Achievements),
+            Skills            = new List<SkillModel>(_jobEditState.Skills)
         };
-        WorkExperienceAppliedState.Add(workExperience);
+        JobAppliedState.Add(job);
 
         #region - Clear Edit State (All)
-        _workExperienceEditState.Employer          = string.Empty;
-        _workExperienceEditState.City              = string.Empty;
-        _workExperienceEditState.State             = string.Empty;
-        _workExperienceEditState.IsRemote          = false;
-        _workExperienceEditState.OfficialJobTitle  = string.Empty;
-        _workExperienceEditState.StartDate         = null;
-        _workExperienceEditState.EndDate           = null;
-        _workExperienceEditState.IsCurrentPosition = false;
-        _workExperienceEditState.Responsibility    = string.Empty;
-        _workExperienceEditState.Achievement       = string.Empty;
-        _workExperienceEditState.Responsibilities.Clear();
-        _workExperienceEditState.Achievements.Clear();
-        _workExperienceEditState.Skills.Clear();
+        _jobEditState.Employer          = string.Empty;
+        _jobEditState.City              = string.Empty;
+        _jobEditState.State             = string.Empty;
+        _jobEditState.IsRemote          = false;
+        _jobEditState.OfficialJobTitle  = string.Empty;
+        _jobEditState.StartDate         = null;
+        _jobEditState.EndDate           = null;
+        _jobEditState.IsCurrentPosition = false;
+        _jobEditState.Responsibility    = string.Empty;
+        _jobEditState.Achievement       = string.Empty;
+        _jobEditState.Responsibilities.Clear();
+        _jobEditState.Achievements.Clear();
+        _jobEditState.Skills.Clear();
         #endregion
     }
 
-    private void RemoveWorkExperience(WorkExperienceModel workExperience)
-    { WorkExperienceAppliedState.Remove(workExperience); }
+    private void RemoveJob(JobModel job)
+    { JobAppliedState.Remove(job); }
 
     private void AddResponsibility()
     {
-        if (string.IsNullOrWhiteSpace(_workExperienceEditState.Responsibility))
+        if (string.IsNullOrWhiteSpace(_jobEditState.Responsibility))
         { return; }
 
-        _workExperienceEditState.Responsibilities.Add(_workExperienceEditState.Responsibility.Trim());
-        _workExperienceEditState.Responsibility = string.Empty;
+        _jobEditState.Responsibilities.Add(_jobEditState.Responsibility.Trim());
+        _jobEditState.Responsibility = string.Empty;
     }
 
     private void RemoveResponsibility(string responsibility)
-    { _workExperienceEditState.Responsibilities.Remove(responsibility); }
+    { _jobEditState.Responsibilities.Remove(responsibility); }
 
     private void AddAchievement()
     {
-        if (string.IsNullOrWhiteSpace(_workExperienceEditState.Achievement))
+        if (string.IsNullOrWhiteSpace(_jobEditState.Achievement))
         { return; }
 
-        _workExperienceEditState.Achievements.Add(_workExperienceEditState.Achievement.Trim());
-        _workExperienceEditState.Achievement = string.Empty;
+        _jobEditState.Achievements.Add(_jobEditState.Achievement.Trim());
+        _jobEditState.Achievement = string.Empty;
     }
 
     private void RemoveAchievement(string achievement)
-    { _workExperienceEditState.Achievements.Remove(achievement); }
+    { _jobEditState.Achievements.Remove(achievement); }
 
     private void CurrentPositionChanged()
     {
-        if (_workExperienceEditState.IsCurrentPosition)
-        { _workExperienceEditState.EndDate = null; }
+        if (_jobEditState.IsCurrentPosition)
+        { _jobEditState.EndDate = null; }
     }
 
     private void RemoteChanged()
     {
-        if (_workExperienceEditState.IsRemote)
+        if (_jobEditState.IsRemote)
         {
             #region - Clear Edit State (City/State)
-            _workExperienceEditState.City  = string.Empty;
-            _workExperienceEditState.State = string.Empty;
+            _jobEditState.City  = string.Empty;
+            _jobEditState.State = string.Empty;
             #endregion
         }
     }
 
-    private void WorkExperienceSkillSelectionChanged(SkillModel skill, ChangeEventArgs eventArgs)
+    private void JobSkillSelectionChanged(SkillModel skill, ChangeEventArgs eventArgs)
     {
         bool isSelected = eventArgs.Value is true;
 
         if (isSelected)
         {
-            if (!_workExperienceEditState.Skills.Contains(skill))
-            { _workExperienceEditState.Skills.Add(skill); }
+            if (!_jobEditState.Skills.Contains(skill))
+            { _jobEditState.Skills.Add(skill); }
         }
         else
-        { _workExperienceEditState.Skills.Remove(skill); }
+        { _jobEditState.Skills.Remove(skill); }
     }
 }

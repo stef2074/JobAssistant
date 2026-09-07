@@ -223,7 +223,7 @@ Initial domain concepts may include:
 ```text
 CandidateProfile
 Skill
-WorkExperience
+Job
 Resume
 JobListing
 JobRequirement
