@@ -1,0 +1,138 @@
+<h2>Professional Summary</h2>
+
+<div class="mb-3">
+    <label class="form-label" for="Headline">Headline</label>
+    <input id="Headline"
+           class="form-control"
+           type="text"
+           @bind="ProfessionalSummaryEditState.Headline" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label" for="Summary">Professional Summary</label>
+    <textarea id="Summary"
+              class="form-control"
+              rows="6"
+              @bind="ProfessionalSummaryEditState.Summary"></textarea>
+</div>
+
+<div>
+    <label class="form-label" for="TotalYearsOfExperience">Total Years of Experience</label>
+    <input id="TotalYearsOfExperience"
+           class="form-control"
+           type="number"
+           min="1"
+           step="1"
+           @bind="ProfessionalSummaryEditState.TotalYearsOfExperience" />
+</div>
+
+<button type="button"
+        class="btn btn-secondary mt-3"
+        @onclick="ApplyProfessionalSummary">
+    Apply
+</button>
+
+@if (_professionalSummaryApplied)
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">@ProfessionalSummaryAppliedState.Headline</h5>
+
+            <p class="card-text">
+                @ProfessionalSummaryAppliedState.Summary
+            </p>
+
+            <p class="card-text mb-0">
+                Total Years of Experience: @ProfessionalSummaryAppliedState.TotalYearsOfExperience
+            </p>
+        </div>
+    </div>
+}
+
+<hr class="my-4" />
+
+@if (_professionalSummaryValidationModal)
+{
+    <div class="modal fade show d-block"
+         tabindex="-1"
+         style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Unable to <strong>Apply</strong> Professional Summary
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            aria-label="Close"
+                            @onclick="CloseProfessionalSummaryValidationModal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Please correct the following:</p>
+
+                    <ul class="mb-0">
+                        @foreach (string message in _professionalSummaryValidationMessages)
+                        {
+                            <li>@message</li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-primary"
+                            @onclick="CloseProfessionalSummaryValidationModal">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public ProfessionalSummaryModel                ProfessionalSummaryEditState    { get; set; } = new ProfessionalSummaryModel();
+    [Parameter] public ProfessionalSummaryModel                ProfessionalSummaryAppliedState { get; set; } = new ProfessionalSummaryModel();
+    [Parameter] public EventCallback<ProfessionalSummaryModel> ProfessionalSummaryApplied      { get; set; }
+
+    private readonly ProfessionalSummaryValidation _professionalSummaryValidation         = new ProfessionalSummaryValidation();
+    private readonly List<string>                  _professionalSummaryValidationMessages = new List<string>();
+
+    private bool _professionalSummaryValidationModal = false;
+    private bool _professionalSummaryApplied         = false;
+
+    private void CloseProfessionalSummaryValidationModal()
+    { _professionalSummaryValidationModal = false; }
+
+    private async Task ApplyProfessionalSummary()
+    {
+        #region - Validation
+        _professionalSummaryValidationMessages.Clear();
+        _professionalSummaryValidationMessages.AddRange(_professionalSummaryValidation.Validate(ProfessionalSummaryEditState));
+
+        if (_professionalSummaryValidationMessages.Count > 0)
+        {
+            _professionalSummaryValidationModal = true;
+            
+            return;
+        }
+        #endregion
+
+        ProfessionalSummaryAppliedState.Headline               = ProfessionalSummaryEditState.Headline;
+        ProfessionalSummaryAppliedState.Summary                = ProfessionalSummaryEditState.Summary;
+        ProfessionalSummaryAppliedState.TotalYearsOfExperience = ProfessionalSummaryEditState.TotalYearsOfExperience;
+
+        _professionalSummaryApplied = true;
+
+        await ProfessionalSummaryApplied.InvokeAsync(ProfessionalSummaryAppliedState);
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrWhiteSpace(ProfessionalSummaryAppliedState.Headline))
+        { _professionalSummaryApplied = true; }
+    }
+}
