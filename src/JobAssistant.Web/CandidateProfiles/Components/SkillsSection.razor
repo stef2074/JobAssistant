@@ -1,0 +1,149 @@
+<h2>Skills</h2>
+
+<div class="mb-3">
+    <label class="form-label" for="skillName">Skill</label>
+    <input id="skillName"
+           class="form-control"
+           type="text"
+           @bind="_skillEditState.Name" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label" for="skillYearsOfExperience">
+        Years of Experience
+    </label>
+
+    <input id="skillYearsOfExperience"
+           class="form-control"
+           type="number"
+           min="1"
+           @bind="_skillEditState.YearsOfExperience" />
+</div>
+
+<button type="button"
+        class="btn btn-secondary"
+        @onclick="AddSkill">
+    Add Skill
+</button>
+
+@if (SkillAppliedState.Count > 0)
+{
+    <div style="max-height: 250px; overflow-y: auto;">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Skill</th>
+                    <th>Years of Experience</th>
+                    <th style="width: 1%"></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (SkillModel skill in SkillAppliedState)
+                {
+                    <tr>
+                        <td>@skill.Name</td>
+                        <td>@skill.YearsOfExperience</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    @onclick="() => RemoveSkill(skill)">
+                                Remove
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<hr class="my-4" />
+
+@if (_skillValidationModal)
+{
+    <div class="modal fade show d-block"
+         tabindex="-1"
+         style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Unable to <strong>Add</strong> Skill
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            aria-label="Close"
+                            @onclick="CloseSkillValidationModal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Please correct the following:</p>
+
+                    <ul class="mb-0">
+                        @foreach (string message in _skillValidationMessages)
+                        {
+                            <li>@message</li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-primary"
+                            @onclick="CloseSkillValidationModal">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public List<SkillModel> SkillAppliedState { get; set; } = new List<SkillModel>();
+    [Parameter] public EventCallback    SkillApplied      { get; set; }
+
+    private readonly SkillModel      _skillEditState          = new SkillModel();
+    private readonly SkillValidation _skillValidation         = new SkillValidation();
+    private readonly List<string>    _skillValidationMessages = new List<string>();
+
+    private bool _skillValidationModal = false;
+
+    private void CloseSkillValidationModal()
+    { _skillValidationModal = false; }
+
+    private async Task AddSkill()
+    {
+        #region - Validation
+        _skillValidationMessages.Clear();
+        _skillValidationMessages.AddRange(_skillValidation.Validate(_skillEditState, SkillAppliedState));
+
+        if (_skillValidationMessages.Count > 0)
+        {
+            _skillValidationModal = true;
+            
+            return;
+        }
+        #endregion
+
+        SkillModel skill = new SkillModel { Name = _skillEditState.Name.Trim(), YearsOfExperience = _skillEditState.YearsOfExperience };
+        SkillAppliedState.Add(skill);
+
+        await SkillApplied.InvokeAsync();
+
+        #region - Clear Edit State
+        _skillEditState.Name              = string.Empty;
+        _skillEditState.YearsOfExperience = 0;
+        #endregion
+    }
+
+    private async Task RemoveSkill(SkillModel skill)
+    {
+        SkillAppliedState.Remove(skill);
+
+        await SkillApplied.InvokeAsync();
+    }
+}

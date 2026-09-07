@@ -87,15 +87,19 @@ JobAssistant/
 │   ├── JobAssistant.Infrastructure/
 │   └── JobAssistant.Web/
 │       └── CandidateProfiles/
+│           ├── Components/
+│           │   ├── ProfessionalSummarySection.razor
+│           │   ├── SkillsSection.razor
+│           │   └── WorkExperienceSection.razor
 │           ├── Models/
 │           │   ├── ProfessionalSummaryModel.cs
 │           │   ├── SkillModel.cs
 │           │   └── WorkExperienceModel.cs
-│           └── Validation/
-│               ├── ProfessionalSummaryValidation.cs
-│               ├── SkillValidation.cs
-│               └── WorkExperienceValidation.cs
-│
+│           ├── Validation/
+│           │   ├── ProfessionalSummaryValidation.cs
+│           │   ├── SkillValidation.cs
+│           │   └── WorkExperienceValidation.cs
+│           └── _Imports.razor
 └── tests/
 ```
 
@@ -491,6 +495,18 @@ Each Candidate Profile UI model has a dedicated validation class:
 - `WorkExperienceModel` → `WorkExperienceValidation`
 
 The UI models represent Blazor-specific editing state, while their validation classes contain the validation rules for that state. This keeps UI models and validation logic separate from `CandidateProfile.razor` and from the Domain models.
+
+### Blazor Components
+
+The Candidate Profile UI is divided into focused Blazor components for its major sections:
+
+- `ProfessionalSummarySection.razor`
+- `SkillsSection.razor`
+- `WorkExperienceSection.razor`
+
+`CandidateProfile.razor` acts as the page-level orchestrator and composes these components while retaining responsibility for Candidate Profile persistence. Component parameters and callbacks provide communication between the page and the individual UI sections.
+
+The component structure keeps the Professional Summary, Skills, and Work Experience markup out of the page-level Razor component while preserving the existing Candidate Profile behavior.
 
 ---
 
