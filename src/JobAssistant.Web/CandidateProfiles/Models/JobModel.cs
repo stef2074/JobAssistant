@@ -1,6 +1,6 @@
 namespace JobAssistant.Web.CandidateProfiles.Models;
 
-public sealed class WorkExperienceModel
+public sealed class JobModel
 {
     public string           Employer          { get; set; } = string.Empty;
     public string           City              { get; set; } = string.Empty;

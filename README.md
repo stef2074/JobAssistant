@@ -90,15 +90,15 @@ JobAssistant/
 │           ├── Components/
 │           │   ├── ProfessionalSummarySection.razor
 │           │   ├── SkillsSection.razor
-│           │   └── WorkExperienceSection.razor
+│           │   └── JobsSection.razor
 │           ├── Models/
 │           │   ├── ProfessionalSummaryModel.cs
 │           │   ├── SkillModel.cs
-│           │   └── WorkExperienceModel.cs
+│           │   └── JobModel.cs
 │           ├── Validation/
 │           │   ├── ProfessionalSummaryValidation.cs
 │           │   ├── SkillValidation.cs
-│           │   └── WorkExperienceValidation.cs
+│           │   └── JobValidation.cs
 │           └── _Imports.razor
 └── tests/
 ```
@@ -463,9 +463,9 @@ Added skills are displayed in a scrollable table and are saved as part of the ex
 
 ### Work Experience
 
-Work Experience entries capture a candidate's employment history.
+Jobs capture a candidate's employment history.
 
-Each Work Experience entry includes:
+Each Job includes:
 
 - Employer
 - City and state, or remote status
@@ -480,9 +480,9 @@ Responsibilities and achievements can be added and removed independently.
 
 Skills used in a role are selected from the existing Candidate Profile Skills rather than entered separately.
 
-Work Experience entries are displayed in Work Experience History and can be removed.
+Jobs are displayed in Job History and can be removed.
 
-Work Experience is saved as part of the existing Candidate Profile and restored when the Candidate Profile is loaded. Current positions are stored with a null end date.
+Jobs are saved as part of the existing Candidate Profile and restored when the Candidate Profile is loaded. Current positions are stored with a null end date.
 
 ### Web Models and Validation
 
@@ -492,7 +492,7 @@ Each Candidate Profile UI model has a dedicated validation class:
 
 - `ProfessionalSummaryModel` → `ProfessionalSummaryValidation`
 - `SkillModel` → `SkillValidation`
-- `WorkExperienceModel` → `WorkExperienceValidation`
+- `JobModel` → `JobValidation`
 
 The UI models represent Blazor-specific editing state, while their validation classes contain the validation rules for that state. This keeps UI models and validation logic separate from `CandidateProfile.razor` and from the Domain models.
 
@@ -502,7 +502,7 @@ The Candidate Profile UI is divided into focused Blazor components for its major
 
 - `ProfessionalSummarySection.razor`
 - `SkillsSection.razor`
-- `WorkExperienceSection.razor`
+- `JobsSection.razor`
 
 `CandidateProfile.razor` acts as the page-level orchestrator and composes these components while retaining responsibility for Candidate Profile persistence. Component parameters and callbacks provide communication between the page and the individual UI sections.
 

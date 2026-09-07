@@ -1,8 +1,8 @@
 namespace JobAssistant.Web.CandidateProfiles.Validation;
 
-public sealed class WorkExperienceValidation
+public sealed class JobValidation
 {
-    public List<string> Validate(WorkExperienceModel model)
+    public List<string> Validate(JobModel model)
     {
         List<string> validationMessages = new List<string>();
 

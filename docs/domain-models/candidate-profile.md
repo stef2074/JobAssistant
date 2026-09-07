@@ -19,7 +19,7 @@ CandidateProfile
 │   ├── Name
 │   └── YearsOfExperience
 │
-├── WorkExperience
+├── Jobs
 │   ├── Employer
 │   ├── Location
 │   ├── OfficialJobTitle

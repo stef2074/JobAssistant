@@ -15,8 +15,8 @@
 <SkillsSection SkillAppliedState="_skillAppliedState"
                SkillApplied="OnSkillApplied" />
 
-<WorkExperienceSection WorkExperienceAppliedState="_workExperienceAppliedState"
-                       Skills="_skillAppliedState" />
+<JobsSection JobAppliedState="_jobAppliedState"
+             Skills="_skillAppliedState" />
 
 <div class="mt-3">
     <button type="button"
@@ -32,7 +32,7 @@
     private readonly ProfessionalSummaryModel  _professionalSummaryEditState    = new ProfessionalSummaryModel();
     private readonly ProfessionalSummaryModel  _professionalSummaryAppliedState = new ProfessionalSummaryModel();
     private readonly List<SkillModel>          _skillAppliedState               = new List<SkillModel>();    
-    private readonly List<WorkExperienceModel> _workExperienceAppliedState      = new List<WorkExperienceModel>();
+    private readonly List<JobModel> _jobAppliedState      = new List<JobModel>();
     
     private async Task Save()
     {
@@ -43,21 +43,21 @@
                 ProfessionalSummary = new ProfessionalSummary { Headline = _professionalSummaryAppliedState.Headline, Summary = _professionalSummaryAppliedState.Summary, TotalYearsOfExperience = _professionalSummaryAppliedState.TotalYearsOfExperience },
                 Skills              = _skillAppliedState.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList(),
 
-                WorkExperience = _workExperienceAppliedState.Select(workExperience => new WorkExperience
+                Jobs = _jobAppliedState.Select(job => new Job
                 {
-                    Employer         = workExperience.Employer,
-                    City             = workExperience.IsRemote ? null : workExperience.City,
-                    State            = workExperience.IsRemote ? null : workExperience.State,
-                    IsRemote         = workExperience.IsRemote,
-                    OfficialJobTitle = workExperience.OfficialJobTitle,
+                    Employer         = job.Employer,
+                    City             = job.IsRemote ? null : job.City,
+                    State            = job.IsRemote ? null : job.State,
+                    IsRemote         = job.IsRemote,
+                    OfficialJobTitle = job.OfficialJobTitle,
 
-                    StartDate = new DateOnly(workExperience.StartDate!.Value.Year, workExperience.StartDate.Value.Month, 1),
-                    EndDate   = workExperience.IsCurrentPosition || workExperience.EndDate is null ? null : new DateOnly(workExperience.EndDate.Value.Year, workExperience.EndDate.Value.Month, 1),
+                    StartDate = new DateOnly(job.StartDate!.Value.Year, job.StartDate.Value.Month, 1),
+                    EndDate   = job.IsCurrentPosition || job.EndDate is null ? null : new DateOnly(job.EndDate.Value.Year, job.EndDate.Value.Month, 1),
 
-                    Responsibilities = new List<string>(workExperience.Responsibilities),
-                    Achievements     = new List<string>(workExperience.Achievements),
+                    Responsibilities = new List<string>(job.Responsibilities),
+                    Achievements     = new List<string>(job.Achievements),
 
-                    Skills = workExperience.Skills.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList()
+                    Skills = job.Skills.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList()
                 }).ToList(),
 
                 JobPreferences = new JobPreferences
@@ -80,21 +80,21 @@
                 ProfessionalSummary = new ProfessionalSummary { Headline = _professionalSummaryAppliedState.Headline, Summary = _professionalSummaryAppliedState.Summary, TotalYearsOfExperience = _professionalSummaryAppliedState.TotalYearsOfExperience },
                 Skills              = _skillAppliedState.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList(),
 
-                WorkExperience = _workExperienceAppliedState.Select(workExperience => new WorkExperience
+                Jobs = _jobAppliedState.Select(job => new Job
                 {
-                    Employer         = workExperience.Employer,
-                    City             = workExperience.IsRemote ? null : workExperience.City,
-                    State            = workExperience.IsRemote ? null : workExperience.State,
-                    IsRemote         = workExperience.IsRemote,
-                    OfficialJobTitle = workExperience.OfficialJobTitle,
+                    Employer         = job.Employer,
+                    City             = job.IsRemote ? null : job.City,
+                    State            = job.IsRemote ? null : job.State,
+                    IsRemote         = job.IsRemote,
+                    OfficialJobTitle = job.OfficialJobTitle,
 
-                    StartDate = new DateOnly(workExperience.StartDate!.Value.Year, workExperience.StartDate.Value.Month, 1),
-                    EndDate   = workExperience.IsCurrentPosition || workExperience.EndDate is null ? null : new DateOnly(workExperience.EndDate.Value.Year, workExperience.EndDate.Value.Month, 1),
+                    StartDate = new DateOnly(job.StartDate!.Value.Year, job.StartDate.Value.Month, 1),
+                    EndDate   = job.IsCurrentPosition || job.EndDate is null ? null : new DateOnly(job.EndDate.Value.Year, job.EndDate.Value.Month, 1),
 
-                    Responsibilities = new List<string>(workExperience.Responsibilities),
-                    Achievements     = new List<string>(workExperience.Achievements),
+                    Responsibilities = new List<string>(job.Responsibilities),
+                    Achievements     = new List<string>(job.Achievements),
 
-                    Skills = workExperience.Skills.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList()
+                    Skills = job.Skills.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList()
                 }).ToList(),
             };
 
@@ -130,27 +130,27 @@
             _skillAppliedState.Add(new SkillModel { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience });
         }
 
-        _workExperienceAppliedState.Clear();
+        _jobAppliedState.Clear();
 
-        foreach (WorkExperience workExperience in _candidateProfile.WorkExperience)
+        foreach (Job job in _candidateProfile.Jobs)
         {
-            _workExperienceAppliedState.Add(new WorkExperienceModel
+            _jobAppliedState.Add(new JobModel
             {
-                Employer          = workExperience.Employer,
-                City              = workExperience.City ?? string.Empty,
-                State             = workExperience.State ?? string.Empty,
-                IsRemote          = workExperience.IsRemote,
-                OfficialJobTitle  = workExperience.OfficialJobTitle,
+                Employer          = job.Employer,
+                City              = job.City ?? string.Empty,
+                State             = job.State ?? string.Empty,
+                IsRemote          = job.IsRemote,
+                OfficialJobTitle  = job.OfficialJobTitle,
 
-                StartDate = new DateTime(workExperience.StartDate.Year, workExperience.StartDate.Month, 1),
-                EndDate   = workExperience.EndDate is null ? null : new DateTime(workExperience.EndDate.Value.Year, workExperience.EndDate.Value.Month, 1),
+                StartDate = new DateTime(job.StartDate.Year, job.StartDate.Month, 1),
+                EndDate   = job.EndDate is null ? null : new DateTime(job.EndDate.Value.Year, job.EndDate.Value.Month, 1),
 
-                IsCurrentPosition = workExperience.EndDate is null,
+                IsCurrentPosition = job.EndDate is null,
 
-                Responsibilities = new List<string>(workExperience.Responsibilities),
-                Achievements     = new List<string>(workExperience.Achievements),
+                Responsibilities = new List<string>(job.Responsibilities),
+                Achievements     = new List<string>(job.Achievements),
 
-                Skills = workExperience.Skills.Select(skill => new SkillModel { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList()
+                Skills = job.Skills.Select(skill => new SkillModel { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList()
             });
         }
     }
