@@ -1,42 +1,51 @@
-<h2>Professional Summary</h2>
+<fieldset class="border rounded p-3 pt-1">
+    <legend class="float-none w-auto px-2 fs-5">
+        <strong>Professional Summary</strong>
+    </legend>
 
-<div class="mb-3">
-    <label class="form-label" for="Headline">Headline</label>
-    <input id="Headline"
-           class="form-control"
-           type="text"
-           @bind="ProfessionalSummaryEditState.Headline" />
-</div>
+    <div class="mb-2">
+        <label class="form-label" for="Headline">Headline</label>
+        <input id="Headline"
+               class="form-control"
+               type="text"
+               @bind="ProfessionalSummaryEditState.Headline" />
+    </div>
 
-<div class="mb-3">
-    <label class="form-label" for="Summary">Professional Summary</label>
-    <textarea id="Summary"
-              class="form-control"
-              rows="6"
-              @bind="ProfessionalSummaryEditState.Summary"></textarea>
-</div>
+    <div class="mb-2">
+        <label class="form-label" for="Summary">Summary</label>
+        <textarea id="Summary"
+                  class="form-control"
+                  rows="6"
+                  @bind="ProfessionalSummaryEditState.Summary"></textarea>
+    </div>
 
-<div>
-    <label class="form-label" for="TotalYearsOfExperience">Total Years of Experience</label>
-    <input id="TotalYearsOfExperience"
-           class="form-control"
-           type="number"
-           min="1"
-           step="1"
-           @bind="ProfessionalSummaryEditState.TotalYearsOfExperience" />
-</div>
+    <div class="mb-2">
+        <label class="form-label" for="TotalYearsOfExperience">
+            Total Years of Experience
+        </label>
 
-<button type="button"
-        class="btn btn-secondary mt-3"
-        @onclick="ApplyProfessionalSummary">
-    Apply
-</button>
+        <input id="TotalYearsOfExperience"
+               class="form-control"
+               type="number"
+               min="1"
+               step="1"
+               @bind="ProfessionalSummaryEditState.TotalYearsOfExperience" />
+    </div>
+
+    <button type="button"
+            class="btn btn-success mt-1"
+            @onclick="AddProfessionalSummary">
+        Add Summary
+    </button>
+</fieldset>
 
 @if (_professionalSummaryApplied)
 {
     <div class="card mt-3">
         <div class="card-body">
-            <h5 class="card-title">@ProfessionalSummaryAppliedState.Headline</h5>
+            <h5 class="card-title">
+                @ProfessionalSummaryAppliedState.Headline
+            </h5>
 
             <p class="card-text">
                 @ProfessionalSummaryAppliedState.Summary
@@ -49,8 +58,6 @@
     </div>
 }
 
-<hr class="my-4" />
-
 @if (_professionalSummaryValidationModal)
 {
     <div class="modal fade show d-block"
@@ -60,7 +67,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        Unable to <strong>Apply</strong> Professional Summary
+                        Unable to <strong>Add</strong> Professional Summary
                     </h5>
 
                     <button type="button"
@@ -107,7 +114,7 @@
     private void CloseProfessionalSummaryValidationModal()
     { _professionalSummaryValidationModal = false; }
 
-    private async Task ApplyProfessionalSummary()
+    private async Task AddProfessionalSummary()
     {
         #region - Validation
         _professionalSummaryValidationMessages.Clear();
