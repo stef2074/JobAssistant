@@ -1,30 +1,33 @@
-<h2>Skills</h2>
+<fieldset class="border rounded p-3 pt-1">
+    <legend class="float-none w-auto px-2 fs-5">
+        <strong>My Skills</strong>
+    </legend>
 
-<div class="mb-3">
-    <label class="form-label" for="skillName">Skill</label>
-    <input id="skillName"
-           class="form-control"
-           type="text"
-           @bind="_skillEditState.Name" />
-</div>
+    <div class="mb-2">
+        <label class="form-label" for="skillName">Skill</label>
+        <input id="skillName"
+               class="form-control"
+               type="text"
+               @bind="_skillEditState.Name" />
+    </div>
 
-<div class="mb-3">
-    <label class="form-label" for="skillYearsOfExperience">
-        Years of Experience
-    </label>
+    <div class="mb-2">
+        <label class="form-label" for="skillYearsOfExperience">
+            Years of Experience
+        </label>
 
-    <input id="skillYearsOfExperience"
-           class="form-control"
-           type="number"
-           min="1"
-           @bind="_skillEditState.YearsOfExperience" />
-</div>
+        <input id="skillYearsOfExperience"
+               class="form-control"
+               type="number"
+               @bind="_skillEditState.YearsOfExperience" />
+    </div>
 
-<button type="button"
-        class="btn btn-secondary"
-        @onclick="AddSkill">
-    Add Skill
-</button>
+    <button type="button"
+            class="btn btn-success mt-1"
+            @onclick="AddSkill">
+        Add Skill
+    </button>
+</fieldset>
 
 @if (SkillAppliedState.Count > 0)
 {
@@ -34,6 +37,7 @@
                 <tr>
                     <th>Skill</th>
                     <th>Years of Experience</th>
+                    <th>Use This Skill</th>
                     <th style="width: 1%"></th>
                 </tr>
             </thead>
@@ -45,8 +49,15 @@
                         <td>@skill.Name</td>
                         <td>@skill.YearsOfExperience</td>
                         <td>
+                            <input type="checkbox"
+                                   class="form-check-input"
+                                   checked="@JobSkillAppliedState.Any(selectedSkill => selectedSkill.Name == skill.Name)"
+                                   @onchange="eventArgs => JobSkillSelectionChanged(skill, eventArgs)" />
+                        </td>
+                        <td>
                             <button type="button"
-                                    class="btn btn-sm btn-outline-danger"
+                                    class="btn btn-sm btn-danger"
+                                    style="height: 31px; padding: 0; width: 70px;"
                                     @onclick="() => RemoveSkill(skill)">
                                 Remove
                             </button>
@@ -57,8 +68,6 @@
         </table>
     </div>
 }
-
-<hr class="my-4" />
 
 @if (_skillValidationModal)
 {
@@ -103,8 +112,9 @@
 }
 
 @code {
-    [Parameter] public List<SkillModel> SkillAppliedState { get; set; } = new List<SkillModel>();
-    [Parameter] public EventCallback    SkillApplied      { get; set; }
+    [Parameter] public List<SkillModel> SkillAppliedState    { get; set; } = new List<SkillModel>();
+    [Parameter] public List<SkillModel> JobSkillAppliedState { get; set; } = new List<SkillModel>();
+    [Parameter] public EventCallback    SkillApplied         { get; set; }
 
     private readonly SkillModel      _skillEditState          = new SkillModel();
     private readonly SkillValidation _skillValidation         = new SkillValidation();
@@ -145,5 +155,18 @@
         SkillAppliedState.Remove(skill);
 
         await SkillApplied.InvokeAsync();
+    }
+
+    private void JobSkillSelectionChanged(SkillModel skill, ChangeEventArgs eventArgs)
+    {
+        bool isSelected = eventArgs.Value is true;
+
+        if (isSelected)
+        {
+            if (!JobSkillAppliedState.Contains(skill))
+            { JobSkillAppliedState.Add(skill); }
+        }
+        else
+        { JobSkillAppliedState.Remove(skill); }
     }
 }
