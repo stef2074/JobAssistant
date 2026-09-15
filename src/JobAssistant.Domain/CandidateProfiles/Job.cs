@@ -9,7 +9,6 @@ public sealed record Job
     public required string                OfficialJobTitle { get; init; }
     public required DateOnly              StartDate        { get; init; }
     public          DateOnly?             EndDate          { get; init; }
-    public required IReadOnlyList<string> Responsibilities { get; init; }
-    public required IReadOnlyList<string> Achievements     { get; init; }
+    public required IReadOnlyList<string> Highlights       { get; init; }
     public required IReadOnlyList<Skill>  Skills           { get; init; }
 }

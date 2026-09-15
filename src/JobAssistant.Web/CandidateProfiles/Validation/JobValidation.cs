@@ -27,8 +27,8 @@ public sealed class JobValidation
         if (model.StartDate is not null && model.EndDate is not null && model.EndDate < model.StartDate)
         {validationMessages.Add("End date cannot be before start date.");}
 
-        if (model.Responsibilities.Count == 0)
-        {validationMessages.Add("At least one responsibility is required.");}
+        if (model.Highlights.Count == 0)
+        {validationMessages.Add("At least one highlight is required.");}
 
         if (model.Skills.Count == 0)
         {validationMessages.Add("At least one skill used in this role is required.");}

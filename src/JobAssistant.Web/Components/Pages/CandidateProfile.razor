@@ -5,10 +5,6 @@
 
 <PageTitle>My Profile</PageTitle>
 
-<h1 class="text-center mb-4">
-    <strong>My Profile</strong>
-</h1>
-
 <div class="mb-3">
     <ProfessionalSummarySection ProfessionalSummaryEditState="_professionalSummaryEditState"
                                 ProfessionalSummaryAppliedState="_professionalSummaryAppliedState"
@@ -64,10 +60,8 @@
                     StartDate = new DateOnly(job.StartDate!.Value.Year, job.StartDate.Value.Month, 1),
                     EndDate   = job.IsCurrentPosition || job.EndDate is null ? null : new DateOnly(job.EndDate.Value.Year, job.EndDate.Value.Month, 1),
 
-                    Responsibilities = new List<string>(job.Responsibilities),
-                    Achievements     = new List<string>(job.Achievements),
-
-                    Skills = job.Skills.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList()
+                    Highlights = new List<string>(job.Highlights),
+                    Skills     = job.Skills.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList()
                 }).ToList(),
 
                 JobPreferences = new JobPreferences
@@ -101,10 +95,8 @@
                     StartDate = new DateOnly(job.StartDate!.Value.Year, job.StartDate.Value.Month, 1),
                     EndDate   = job.IsCurrentPosition || job.EndDate is null ? null : new DateOnly(job.EndDate.Value.Year, job.EndDate.Value.Month, 1),
 
-                    Responsibilities = new List<string>(job.Responsibilities),
-                    Achievements     = new List<string>(job.Achievements),
-
-                    Skills = job.Skills.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList()
+                    Highlights = new List<string>(job.Highlights),
+                    Skills     = job.Skills.Select(skill => new Skill { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList()
                 }).ToList(),
             };
 
@@ -153,10 +145,8 @@
 
                 IsCurrentPosition = job.EndDate is null,
 
-                Responsibilities = new List<string>(job.Responsibilities),
-                Achievements     = new List<string>(job.Achievements),
-
-                Skills = job.Skills.Select(skill => new SkillModel { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList()
+                Highlights = new List<string>(job.Highlights),
+                Skills     = job.Skills.Select(skill => new SkillModel { Name = skill.Name, YearsOfExperience = skill.YearsOfExperience }).ToList()
             });
         }
     }
