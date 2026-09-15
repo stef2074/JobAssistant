@@ -25,8 +25,7 @@ CandidateProfile
 │   ├── OfficialJobTitle
 │   ├── StartDate
 │   ├── EndDate
-│   ├── Responsibilities
-│   ├── Achievements
+│   ├── Highlights
 │   └── Skills
 │
 └── JobPreferences
@@ -41,4 +40,6 @@ CandidateProfile
 
 - The model represents business concepts rather than persistence or UI concerns.
 - The model should remain independent of AI providers and external job platforms.
+- Each Job Highlight represents a résumé-ready statement describing meaningful work, technical ownership, project delivery, business impact, measurable accomplishments, or leadership associated with that Job.
+- Job Highlights remain separate from the Skills used in the role.
 - Additional concepts such as Education and Certifications may be introduced when they provide business value.

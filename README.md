@@ -131,7 +131,11 @@ Additional architectural details are available in the project documentation.
 
 - [Architecture](docs/architecture.md)
 - [Engineering Principles](docs/engineering-principles.md)
+- [Candidate Profile Domain Model](docs/domain-models/candidate-profile.md)
 - [Architecture Decision Records](docs/adr/README.md)
+- [JA-35: Refactor Candidate Profile Work Experience Terminology to Jobs](docs/tutorials/JA-35-refactor-candidate-profile-work-experience-terminology-to-jobs.md)
+- [JA-36: Restructure Candidate Profile Work Experience UI](docs/tutorials/JA-36-restructure-candidate-profile-work-experience-ui.md)
+- [JA-37: Refactor Job Responsibilities and Achievements into Highlights](docs/tutorials/JA-37-refactor-job-responsibilities-and-achievements-into-highlights.md)
 
 ---
 
@@ -141,10 +145,15 @@ Development follows a structured engineering workflow:
 
 1. Create a Jira task.
 2. Create a Git feature branch.
-3. Implement the change.
-4. Commit using the Jira issue key.
-5. Complete the Jira task.
-6. Merge into the main branch.
+3. Implement the change incrementally.
+4. Build and verify each meaningful change.
+5. Create a separate commit for each meaningful, verified change using the Jira issue key.
+6. Manually regression test the completed feature.
+7. Update `README.md` and create the Jira implementation tutorial.
+8. Create a pull request with Summary, Changes, and Validation sections.
+9. Review and verify the pull request before merging it into `main`.
+10. Add the Jira closing comment with Summary, Deliverables, Validation, and Lessons Learned sections.
+11. Complete the Jira task.
 
 This approach provides complete traceability between planning, implementation, and source control.
 
@@ -210,7 +219,7 @@ JobAssistant application logs are forwarded from Azure App Service to the centra
 To verify application logging:
 
 1. Open the deployed JobAssistant application.
-2. Navigate to the Candidate Profile page to generate an application log entry.
+2. Navigate to the My Profile page to generate an application log entry.
 3. Open the `law-monitoring` Log Analytics Workspace in the Management subscription.
 4. Run the following query:
 
@@ -413,7 +422,7 @@ After the workflow completes successfully:
 
 1. Open the Development JobAssistant App Service.
 2. Verify that the application loads successfully.
-3. Navigate to the Candidate Profile page.
+3. Navigate to the My Profile page.
 4. Verify that the application behaves as expected.
 
 ### Verify Application Logging
@@ -448,7 +457,7 @@ Professional Summary input is validated before being applied. Headline and profe
 
 The Apply action validates the editable Professional Summary and updates the applied summary displayed to the user. The applied Professional Summary is saved as part of the Candidate Profile and restored when the Candidate Profile is loaded.
 
-### Skills
+### My Skills
 
 Skills can be added to and removed from the Candidate Profile.
 
@@ -461,9 +470,13 @@ Skill input is validated before being added. Skill names must be unique, cannot 
 
 Added skills are displayed in a scrollable table and are saved as part of the existing Candidate Profile. Previously saved skills are restored when the Candidate Profile is loaded.
 
-### Work Experience
+Each Candidate Profile Skill also includes a **Use This Skill** checkbox. The checkbox represents temporary Job-editing state and is not persisted as part of `SkillModel` or the Candidate Profile Skill itself.
 
-Jobs capture a candidate's employment history.
+When a Job is added, the selected Candidate Profile Skills are copied into that Job's Skills collection. The Use This Skill selections are then cleared so a different set of Skills can be selected for the next Job.
+
+### My Jobs
+
+My Jobs captures a candidate's Work Experience and employment history.
 
 Each Job includes:
 
@@ -472,15 +485,16 @@ Each Job includes:
 - Official job title
 - Start date
 - End date or current-position status
-- Responsibilities
-- Achievements
+- Highlights
 - Skills used in the role
 
-Responsibilities and achievements can be added and removed independently.
+Each Highlight represents a résumé-ready statement describing meaningful work, technical ownership, project delivery, business impact, measurable accomplishments, or leadership associated with a Job.
 
-Skills used in a role are selected from the existing Candidate Profile Skills rather than entered separately.
+Highlights can be added to and removed from the Job currently being entered. Added Highlights are displayed in the order in which they were entered, and the list becomes scrollable as additional Highlights are added.
 
-Jobs are displayed in Job History and can be removed.
+Skills used in a role are selected from My Skills using the **Use This Skill** checkboxes rather than entered separately in My Jobs. At least one Highlight must be added and at least one Skill must be selected before a Job can be added.
+
+Jobs are displayed in the Job History fieldset within My Jobs and can be removed.
 
 Jobs are saved as part of the existing Candidate Profile and restored when the Candidate Profile is loaded. Current positions are stored with a null end date.
 
@@ -506,7 +520,9 @@ The Candidate Profile UI is divided into focused Blazor components for its major
 
 `CandidateProfile.razor` acts as the page-level orchestrator and composes these components while retaining responsibility for Candidate Profile persistence. Component parameters and callbacks provide communication between the page and the individual UI sections.
 
-The component structure keeps the Professional Summary, Skills, and Work Experience markup out of the page-level Razor component while preserving the existing Candidate Profile behavior.
+The page also coordinates contextual Job Skill selection between `SkillsSection.razor` and `JobsSection.razor`. `SkillsSection.razor` updates the temporary selection state, and `JobsSection.razor` uses that state when adding a Job. The selected Skills are copied into the Job before the temporary selections are cleared.
+
+The component structure keeps the Professional Summary, My Skills, and My Jobs markup out of the page-level Razor component while preserving the existing Candidate Profile behavior.
 
 ---
 
@@ -519,8 +535,8 @@ The project foundation and initial Azure deployment pipeline are established.
 The Candidate Profile currently supports:
 
 - Professional Summary
-- Skills
-- Work Experience
+- My Skills, including contextual Skill selection for Jobs
+- My Jobs and Job History
 
 The next Candidate Profile capabilities will continue to be implemented incrementally, including Job Preferences.
 
