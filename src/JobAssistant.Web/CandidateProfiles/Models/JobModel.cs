@@ -10,9 +10,7 @@ public sealed class JobModel
     public DateTime?        StartDate         { get; set; } = null;
     public DateTime?        EndDate           { get; set; } = null;
     public bool             IsCurrentPosition { get; set; } = false;
-    public string           Responsibility    { get; set; } = string.Empty;
-    public string           Achievement       { get; set; } = string.Empty;
-    public List<string>     Responsibilities  { get; set; } = new List<string>();
-    public List<string>     Achievements      { get; set; } = new List<string>();
+    public string           Highlight         { get; set; } = string.Empty;
+    public List<string>     Highlights        { get; set; } = new List<string>();
     public List<SkillModel> Skills            { get; set; } = new List<SkillModel>();
 }
